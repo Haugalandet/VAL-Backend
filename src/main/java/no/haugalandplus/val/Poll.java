@@ -1,18 +1,15 @@
 package no.haugalandplus.val;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.Getter;
 
 @Getter
 @Entity
 public class Poll {
-    @Id
-    private long pollId;
 
-    @OneToOne
-    private User user;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
     @OneToOne
     private Config config;

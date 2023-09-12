@@ -1,22 +1,29 @@
 package no.haugalandplus.val;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Entity
-public class User {
+@Table(name = "tbl_user")
+class User {
 
     @Id
-    private long userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Setter
     private String username;
 
     @Setter
     private String password;
+
+    @OneToMany(mappedBy = "owner")
+    private List<Config> configs;
+
 
     public User() {}
 

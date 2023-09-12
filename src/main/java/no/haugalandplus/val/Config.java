@@ -1,18 +1,18 @@
 package no.haugalandplus.val;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Entity
 public class Config {
-    @Id
-    private long configId;
 
-    @ManyToOne
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    @ManyToOne(cascade = CascadeType.MERGE)
     private User owner;
 
     @Setter

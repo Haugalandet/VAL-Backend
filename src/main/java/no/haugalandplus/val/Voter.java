@@ -9,8 +9,10 @@ import java.util.Set;
 @Getter
 @Entity
 public class Voter {
+
     @Id
-    private long voterId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
     @ManyToOne
     private Poll poll;
