@@ -20,10 +20,7 @@ public class ValApplication {
 			em.getTransaction().commit();
 
 		}
-
-
-		SpringApplication.run(ValApplication.class, args);
-
+		
 	}
 
 
