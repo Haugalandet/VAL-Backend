@@ -29,8 +29,7 @@ public class Config {
     @Setter
     private boolean anon;
 
-    public Config(long configId, User owner) {
-        this.configId = configId;
+    public Config(User owner) {
         this.owner = owner;
         anon = true;
     }

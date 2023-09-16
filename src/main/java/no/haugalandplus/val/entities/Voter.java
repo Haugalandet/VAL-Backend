@@ -23,8 +23,7 @@ public class Voter {
     private Set<User> voters = new HashSet<>();
 
 
-    public Voter(long voterId,Poll poll) {
-        this.voterId = voterId;
+    public Voter(Poll poll) {
         this.poll = poll;
     }
 

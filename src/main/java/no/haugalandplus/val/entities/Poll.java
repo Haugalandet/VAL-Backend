@@ -24,8 +24,7 @@ public class Poll {
 
     private String description;
 
-    public Poll(long pollId, User user, Config config, String title, String description) {
-        this.pollId = pollId;
+    public Poll(User user, Config config, String title, String description) {
         this.user = user;
         this.config = config;
         this.title = title;
