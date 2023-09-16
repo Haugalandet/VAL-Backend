@@ -1,28 +1,69 @@
 package no.haugalandplus.val;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
+import no.haugalandplus.val.entities.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+
+import java.util.Arrays;
 
 @SpringBootApplication
 public class ValApplication {
 
+	private static ConfigRepository configRepository;
+
+	private static PollRepository pollRepository;
+
+	private static UserRepository userRepository;
+
+	private static VoterRepository voterRepository;
+
 	public static void main(String[] args) {
-		try (EntityManagerFactory factory = Persistence.createEntityManagerFactory("jpa-tutorial");
-			 EntityManager em = factory.createEntityManager()) {
+		ApplicationContext context = SpringApplication.run(ValApplication.class, args);
+
+		// Inits repos
+
+		configRepository = context.getBean(ConfigRepository.class);
+		pollRepository = context.getBean(PollRepository.class);
+		userRepository = context.getBean(UserRepository.class);
+		voterRepository = context.getBean(VoterRepository.class);
 
 
-			// Insert new object
-			em.getTransaction().begin();
-			em.persist(new User("Nils Michael", "passord123"));
-			em.getTransaction().commit();
+		// Creates test data
 
+		User nils = new User("NilsMichael", "Fitjar");
+		User martin = new User("MartinTunge", "Sterri");
+		User helene = new User("HeleneSineNotatarHubert", "Solhaug");
+		User lasse = new User("LasseLarsMartin", "Taraldset");
+
+
+		Config config = new Config(nils);
+
+		config.setConfigName("Default Config");
+
+		config.setDescription("Default configuration for a poll");
+
+		config.setAnon(false);
+
+		config.setChoice0Name("Ja");
+		config.setChoice1Name("Nei");
+
+		Poll poll = new Poll(nils, config, "Er Nils kul?", "I denne pollen, skal man stemme på om Nils er kul!");
+
+		Voter voters = new Voter(poll);
+
+		for (User u: new User[]{ martin, helene, lasse }) {
+			poll.incrementChoice1(1);
+			voters.addUser(u);
 		}
 
 
-		SpringApplication.run(ValApplication.class, args);
+		userRepository.saveAll(Arrays.asList(nils, martin, helene, lasse));
+
+		configRepository.save(config);
+		pollRepository.save(poll);
+		voterRepository.save(voters);
+
 
 	}
 
