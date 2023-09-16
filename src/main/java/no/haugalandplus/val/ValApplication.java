@@ -1,28 +1,27 @@
 package no.haugalandplus.val;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
+import no.haugalandplus.val.entities.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+
+import java.util.Arrays;
 
 @SpringBootApplication
 public class ValApplication {
 
+	private static ConfigRepository configRepository;
+
+	private static PollRepository pollRepository;
+
+	private static UserRepository userRepository;
+
+	private static VoterRepository voterRepository;
+
 	public static void main(String[] args) {
-		try (EntityManagerFactory factory = Persistence.createEntityManagerFactory("jpa-tutorial");
-			 EntityManager em = factory.createEntityManager()) {
+		ApplicationContext context = SpringApplication.run(ValApplication.class, args);
 
-
-			// Insert new object
-			em.getTransaction().begin();
-			em.persist(new User("Nils Michael", "passord123"));
-			em.getTransaction().commit();
-
-		}
-
-
-		SpringApplication.run(ValApplication.class, args);
 
 	}
 

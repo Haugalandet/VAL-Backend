@@ -1,8 +1,6 @@
-package no.haugalandplus.val;
+package no.haugalandplus.val.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,6 +8,7 @@ import lombok.Setter;
 @Entity
 public class Config {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long configId;
 
     @ManyToOne
@@ -29,4 +28,14 @@ public class Config {
 
     @Setter
     private boolean anon;
+
+    public Config(long configId, User owner) {
+        this.configId = configId;
+        this.owner = owner;
+        anon = true;
+    }
+
+    public Config() {
+
+    }
 }
