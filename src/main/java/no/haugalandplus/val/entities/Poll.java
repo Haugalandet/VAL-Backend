@@ -3,17 +3,21 @@ package no.haugalandplus.val.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Getter
 @Entity
 public class Poll {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long pollId;
 
-    @OneToOne
+    @ManyToOne
     private User user;
 
-    @OneToOne
+    @ManyToOne
     private Config config;
 
     private long choice0Count = 0;
@@ -24,6 +28,9 @@ public class Poll {
 
     private String description;
 
+    @OneToMany(mappedBy = "poll")
+    private Set<Vote> votes = new HashSet<>();
+
     public Poll(User user, Config config, String title, String description) {
         this.user = user;
         this.config = config;
@@ -31,15 +38,5 @@ public class Poll {
         this.description = description;
     }
 
-    public Poll() {
-
-    }
-
-    public void incrementChoice0(long count) {
-        choice0Count += count;
-    }
-
-    public void incrementChoice1(long count) {
-        choice1Count += count;
-    }
+    public Poll() {}
 }

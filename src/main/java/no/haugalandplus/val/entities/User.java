@@ -1,11 +1,11 @@
 package no.haugalandplus.val.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Entity
@@ -20,6 +20,9 @@ public class User {
 
     @Setter
     private String password;
+
+    @OneToMany(mappedBy = "user")
+    private Set<Poll> polls = new HashSet<>();
 
     public User() {}
 

@@ -16,7 +16,7 @@ public class ValApplication {
 
 	private static UserRepository userRepository;
 
-	private static VoterRepository voterRepository;
+	private static VoteRepository voteRepository;
 
 	public static void main(String[] args) {
 		ApplicationContext context = SpringApplication.run(ValApplication.class, args);
@@ -26,7 +26,7 @@ public class ValApplication {
 		configRepository = context.getBean(ConfigRepository.class);
 		pollRepository = context.getBean(PollRepository.class);
 		userRepository = context.getBean(UserRepository.class);
-		voterRepository = context.getBean(VoterRepository.class);
+		voteRepository = context.getBean(VoteRepository.class);
 
 
 		// Creates test data
@@ -50,19 +50,14 @@ public class ValApplication {
 
 		Poll poll = new Poll(nils, config, "Er Nils kul?", "I denne pollen, skal man stemme på om Nils er kul!");
 
-		Voter voters = new Voter(poll);
-
-		for (User u: new User[]{ martin, helene, lasse }) {
-			poll.incrementChoice1(1);
-			voters.addUser(u);
-		}
-
-
 		userRepository.saveAll(Arrays.asList(nils, martin, helene, lasse));
-
 		configRepository.save(config);
 		pollRepository.save(poll);
-		voterRepository.save(voters);
+
+		for (User u: new User[]{ martin, helene, lasse }) {
+			Vote vote = new Vote(poll, u, true);
+			voteRepository.save(vote);
+		}
 
 
 	}

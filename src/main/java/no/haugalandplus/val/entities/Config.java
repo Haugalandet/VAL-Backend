@@ -7,6 +7,7 @@ import lombok.Setter;
 @Getter
 @Entity
 public class Config {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long configId;
@@ -34,7 +35,5 @@ public class Config {
         anon = true;
     }
 
-    public Config() {
-
-    }
+    public Config() {}
 }
