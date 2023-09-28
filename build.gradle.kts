@@ -26,6 +26,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.xerial:sqlite-jdbc:3.41.2.2")
 	implementation("org.hibernate:hibernate-community-dialects:6.3.0.Final")
+	implementation("org.modelmapper:modelmapper:2.1.1")
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	annotationProcessor("org.projectlombok:lombok")

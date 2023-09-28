@@ -1,6 +1,10 @@
 package no.haugalandplus.val;
 
 import no.haugalandplus.val.entities.*;
+import no.haugalandplus.val.repository.ConfigRepository;
+import no.haugalandplus.val.repository.PollRepository;
+import no.haugalandplus.val.repository.UserRepository;
+import no.haugalandplus.val.repository.VoteRepository;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
