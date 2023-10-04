@@ -5,14 +5,21 @@ import no.haugalandplus.val.repository.ConfigRepository;
 import no.haugalandplus.val.repository.PollRepository;
 import no.haugalandplus.val.repository.UserRepository;
 import no.haugalandplus.val.repository.VoteRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 
 import java.util.Arrays;
 
 @SpringBootApplication
 public class ValApplication {
+
+	@Bean
+	public ModelMapper modelMapper() {
+		return new ModelMapper();
+	}
 
 	private static ConfigRepository configRepository;
 
@@ -48,9 +55,6 @@ public class ValApplication {
 		config.setDescription("Default configuration for a poll");
 
 		config.setAnon(false);
-
-		config.setChoice0Name("Ja");
-		config.setChoice1Name("Nei");
 
 		Poll poll = new Poll(nils, config, "Er Nils kul?", "I denne pollen, skal man stemme på om Nils er kul!");
 
