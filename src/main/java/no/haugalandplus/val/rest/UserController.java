@@ -25,8 +25,8 @@ public class UserController {
         return userservice.insertUser(user);
     }
     @DeleteMapping("/{id}")
-    public User deleteUser(@PathVariable Long id) {
-        return null;
+    public UserDTO deleteUser(@PathVariable Long id) {
+        return userservice.removeUser(getUser(id));
     }
 
     @PutMapping("/{id}")
@@ -35,8 +35,8 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User getUser(@PathVariable Long id) {
-        return null;
+    public UserDTO getUser(@PathVariable Long id) {
+        return userservice.getUser(id);
     }
 
     @GetMapping

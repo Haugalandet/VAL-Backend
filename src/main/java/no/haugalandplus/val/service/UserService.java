@@ -6,11 +6,14 @@ import no.haugalandplus.val.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class UserService {
 
     private UserRepository userRepository;
+
+    private long id = 0L;
 
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -19,9 +22,29 @@ public class UserService {
     public User insertUser(User user) {
         User existing = userRepository.getUserByUsername(user.getUsername());
         if(existing != null) {
-            throw new RuntimeException("fuck deg, du suger!!!!");
+            throw new NoSuchElementException(user.getUsername()
+                    + " already exist, please choose something else!");
         }
         return userRepository.save(user);
+    }
+
+
+    //ER IKKE FERDIG MED DENNE METODEN BTW
+    public UserDTO removeUser(UserDTO user) {
+        long userId = user.getUserId();
+        Boolean existing = userRepository.existsById(userId);
+        if(!existing) {
+            throw new NoSuchElementException("User with ID: "
+                    + userId + " is not found!");
+        }
+        userRepository.deleteById(userId);
+        return user;
+    }
+
+    public UserDTO getUser(long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException());
+        return convert(user);
     }
 
     public List<UserDTO> getAllUsers() {
