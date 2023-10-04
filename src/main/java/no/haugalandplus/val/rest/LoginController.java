@@ -29,19 +29,7 @@ public class LoginController {
                 user.getUsername(),
                 user.getPassword());
 
-        System.out.println("\nAuthentication Token Before Authentication: " + token);
-
         Authentication authResult = authenticationManager.authenticate(token);
-
-        System.out.println();
-        System.out.println("Authentication Token After Authentication: " + authResult);
-        System.out.println();
-
-        System.out.println("Authentication Token in Security Context: " + SecurityContextHolder.getContext().getAuthentication());
-
-        System.out.println();
-        if(authResult.isAuthenticated())
-            System.out.println("User is Authenticated");
 
         return true;
     }

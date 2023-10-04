@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter
+@Setter
 @Entity
 public class Config {
 
@@ -15,19 +16,10 @@ public class Config {
     @ManyToOne
     private User owner;
 
-    @Setter
     private String configName;
 
-    @Setter
     private String description;
 
-    @Setter
-    private String choice0Name;
-
-    @Setter
-    private String choice1Name;
-
-    @Setter
     private boolean anon;
 
     public Config(User owner) {
