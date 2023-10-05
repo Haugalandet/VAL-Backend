@@ -3,31 +3,25 @@ package no.haugalandplus.val.entities;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Entity
 public class Vote {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long voteId;
 
-    @ManyToOne(cascade = CascadeType.MERGE)
-    private Poll poll;
+    @ManyToOne
+    private PollInst pollInst;
 
     @ManyToOne
     private User voter;
 
+    @ManyToOne
+    private PollChoice pollChoice;
+
     private Integer voteCount;
-
-    private Boolean choice;
-
-    public Vote(Poll poll, User voter, Boolean choice) {
-        this.poll = poll;
-        this.voter = voter;
-        this.choice = choice;
-        this.voteCount = 1;
-    }
-
-    public Vote() {}
 
 }

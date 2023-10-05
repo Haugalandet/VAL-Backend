@@ -22,10 +22,6 @@ public class Poll {
     @ManyToOne
     private Config config;
 
-
-    @OneToMany(mappedBy = "poll")
-    private Set<Vote> votes = new HashSet<>();
-
     public Poll(User user, Config config) {
         this.user = user;
         this.config = config;
