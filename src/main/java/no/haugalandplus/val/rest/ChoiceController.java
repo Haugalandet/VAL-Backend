@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/poll/{poll-id}/choices")
+@RequestMapping("/polls/{poll-id}/choices")
 public class ChoiceController {
 
     private ChoiceService choiceService;
