@@ -2,6 +2,7 @@ package no.haugalandplus.val.rest;
 
 import no.haugalandplus.val.dto.PollDTO;
 import no.haugalandplus.val.entities.Poll;
+import no.haugalandplus.val.service.PollChoiceService;
 import no.haugalandplus.val.service.PollService;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +13,8 @@ import java.util.List;
 public class PollController {
 
     private PollService pollService;
+
+    private PollChoiceService pollChoiceService;
 
     public PollController(PollService pollService) {
         this.pollService = pollService;
@@ -37,4 +40,7 @@ public class PollController {
     public PollDTO deletePoll(@PathVariable Long id) {
         return pollService.deletePoll(id);
     }
+
+
+
 }
