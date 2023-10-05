@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/poll-choices")
+@RequestMapping("/poll/{pollid}/choices")
 public class PollChoiceController {
 
     private PollChoiceService pollChoiceService;
@@ -28,8 +28,8 @@ public class PollChoiceController {
 
     @PostMapping
     @PutMapping("/{id}")
-    public PollChoiceDTO createPollChoice(@RequestBody PollChoiceDTO pollChoice) {
-        return pollChoiceService.saveOrUpdate(pollChoice);
+    public PollChoiceDTO createPollChoice(@RequestBody PollChoiceDTO pollChoice, @PathVariable("pollid") Long pollId) {
+        return pollChoiceService.saveOrUpdate(pollId, pollChoice);
     }
 
     @DeleteMapping("/{id}")

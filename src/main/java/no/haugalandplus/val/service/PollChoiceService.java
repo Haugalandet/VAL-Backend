@@ -3,6 +3,7 @@ package no.haugalandplus.val.service;
 import no.haugalandplus.val.dto.PollChoiceDTO;
 import no.haugalandplus.val.entities.PollChoice;
 import no.haugalandplus.val.repository.PollChoiceRepository;
+import no.haugalandplus.val.repository.PollRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +14,12 @@ import java.util.NoSuchElementException;
 public class PollChoiceService {
 
     private PollChoiceRepository pollChoiceRepository;
+    private PollRepository pollRepository;
     private ModelMapper modelMapper;
 
-    public PollChoiceService(PollChoiceRepository pollChoiceRepository, ModelMapper modelMapper) {
+    public PollChoiceService(PollChoiceRepository pollChoiceRepository, PollRepository pollRepository, ModelMapper modelMapper) {
         this.pollChoiceRepository = pollChoiceRepository;
+        this.pollRepository = pollRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -31,8 +34,10 @@ public class PollChoiceService {
                 .stream().map(this::convertToDTO).toList();
     }
 
-    public PollChoiceDTO saveOrUpdate(PollChoiceDTO pollChoiceDTO) {
-        return convertToDTO(pollChoiceRepository.save(convertFromDTO(pollChoiceDTO)));
+    public PollChoiceDTO saveOrUpdate(Long pollId, PollChoiceDTO pollChoiceDTO) {
+        PollChoice pollChoice = convertFromDTO(pollChoiceDTO);
+        pollChoice.setPoll(pollRepository.findById(pollId).get());
+        return convertToDTO(pollChoiceRepository.save(pollChoice));
     }
 
     public PollChoiceDTO delete(Long id) {
