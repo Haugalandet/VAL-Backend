@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Getter
 @Setter
@@ -19,7 +17,7 @@ public class PollResult {
     private PollInst pollInst;
 
     @ManyToOne
-    private PollChoice pollChoice;
+    private Choice choice;
 
     private long totalCount;
 }

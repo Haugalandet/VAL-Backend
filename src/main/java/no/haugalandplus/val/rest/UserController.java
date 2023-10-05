@@ -21,7 +21,7 @@
         }
 
         @PostMapping
-        public User createUser(@RequestBody User user) {
+        public UserDTO createUser(@RequestBody User user) {
             return userservice.insertUser(user);
         }
         @DeleteMapping("/{id}")

@@ -18,7 +18,7 @@ public class PollInst {
     @ManyToOne
     private Poll poll;
 
-    private String title;
+    private String name;
     private String description;
 
     private LocalDateTime startTime;

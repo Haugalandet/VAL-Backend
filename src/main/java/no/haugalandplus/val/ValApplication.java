@@ -43,39 +43,39 @@ public class ValApplication {
 
 		// Inits repos
 
-		configRepository = context.getBean(ConfigRepository.class);
-		pollRepository = context.getBean(PollRepository.class);
-		userRepository = context.getBean(UserRepository.class);
-		voteRepository = context.getBean(VoteRepository.class);
-		pollInstRepository = context.getBean(PollInstRepository.class);
-
-
-		// Creates test data
-
-		User nils = new User("NilsMichael", "Fitjar");
-		User martin = new User("MartinTunge", "Sterri");
-		User helene = new User("HeleneSineNotatarHubert", "Solhaug");
-		User lasse = new User("LasseLarsMartin", "Taraldset");
-
-
-		Config config = new Config(nils);
-
-		config.setConfigName("Default Config");
-
-		config.setDescription("Default configuration for a poll");
-
-		config.setAnon(false);
-
-		Poll poll = new Poll(nils, config);
-
-		PollInst pollInst = new PollInst();
-		pollInst.setPoll(poll);
-
-		userRepository.saveAll(Arrays.asList(nils, martin, helene, lasse));
-		configRepository.save(config);
-		pollRepository.save(poll);
-
-		pollInstRepository.save(pollInst);
+//		configRepository = context.getBean(ConfigRepository.class);
+//		pollRepository = context.getBean(PollRepository.class);
+//		userRepository = context.getBean(UserRepository.class);
+//		voteRepository = context.getBean(VoteRepository.class);
+//		pollInstRepository = context.getBean(PollInstRepository.class);
+//
+//
+//		// Creates test data
+//
+//		User nils = new User("NilsMichael", "Fitjar");
+//		User martin = new User("MartinTunge", "Sterri");
+//		User helene = new User("HeleneSineNotatarHubert", "Solhaug");
+//		User lasse = new User("LasseLarsMartin", "Taraldset");
+//
+//
+//		Config config = new Config(nils);
+//
+//		config.setConfigName("Default Config");
+//
+//		config.setDescription("Default configuration for a poll");
+//
+//		config.setAnon(false);
+//
+//		Poll poll = new Poll(nils, config);
+//
+//		PollInst pollInst = new PollInst();
+//		pollInst.setPoll(poll);
+//
+//		userRepository.saveAll(Arrays.asList(nils, martin, helene, lasse));
+//		configRepository.save(config);
+//		pollRepository.save(poll);
+//
+//		pollInstRepository.save(pollInst);
 
 	}
 

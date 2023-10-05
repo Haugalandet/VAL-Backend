@@ -21,13 +21,13 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User insertUser(User user) {
+    public UserDTO insertUser(User user) {
         User existing = userRepository.getUserByUsername(user.getUsername());
         if(existing != null) {
             throw new RuntimeException(user.getUsername()
                     + " already exist, please choose something else!");
         }
-        return userRepository.save(user);
+        return convertToDTO(userRepository.save(user));
     }
 
     public void removeUser(UserDTO user) {
@@ -49,9 +49,11 @@ public class UserService {
         User updatedUser = convertToUser(userDTO);
         User existingUser = userRepository.findById(userDTO.getUserId()).get();
 
-        existingUser.setPassword(existingUser.getPassword());
-        existingUser.setUsername(updatedUser.getUsername());
-        return convertToDTO(existingUser);
+        updatedUser.setPassword(existingUser.getPassword());
+
+        updatedUser = userRepository.save(updatedUser);
+
+        return convertToDTO(updatedUser);
     }
 
     public UserDTO getUser(long id) {

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping({"/poll-instances", "/poll/{poll-id}/poll-instances"})
+@RequestMapping({ "/poll/{poll-id}/poll-instances"})
 public class PollInstController {
 
     private PollInstService pollInstService;
@@ -29,8 +29,8 @@ public class PollInstController {
 
     @PostMapping
     @PutMapping("/{id}")
-    public PollInstDTO insertOrUpdatePollInst(@RequestBody PollInstDTO pollInstDTO) {
-        return pollInstService.save(pollInstDTO);
+    public PollInstDTO insertOrUpdatePollInst(@RequestBody PollInstDTO pollInstDTO, @PathVariable("poll-id") Long pollId) {
+        return pollInstService.save(pollId, pollInstDTO);
     }
 
     @DeleteMapping("/{id}")
@@ -39,7 +39,7 @@ public class PollInstController {
     }
 
     @PostMapping("/{pollInstId}/votes")
-    public boolean vote(@PathVariable Long pollInstId, @RequestBody VoteDTO vote) {
+    public Long vote(@PathVariable Long pollInstId, @RequestBody VoteDTO vote) {
         return pollInstService.vote(pollInstId, vote);
     }
 }

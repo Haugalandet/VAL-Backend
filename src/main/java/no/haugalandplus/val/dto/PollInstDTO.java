@@ -13,7 +13,7 @@ public class PollInstDTO {
 
     private Long pollId;
 
-    private String title;
+    private String name;
     private String description;
 
     private LocalDateTime startTime;

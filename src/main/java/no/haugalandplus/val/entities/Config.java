@@ -16,7 +16,7 @@ public class Config {
     @ManyToOne
     private User owner;
 
-    private String configName;
+    private String name;
 
     private String description;
 

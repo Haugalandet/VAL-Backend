@@ -7,11 +7,11 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-public class PollChoice {
+public class Choice {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long pollChoiceId;
+    private Long ChoiceId;
 
     @ManyToOne
     private Poll poll;

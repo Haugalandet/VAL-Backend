@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class PollService {
+public class PollService extends Utils {
 
     private PollRepository pollRepository;
     private ModelMapper modelMapper;
@@ -36,6 +36,13 @@ public class PollService {
     public PollDTO getPoll(Long id) {
         return convert(pollRepository.findById(id).get());
     }
+
+    public PollDTO createPoll(PollDTO pollDTO) {
+        Poll poll = convert(pollDTO);
+        poll.setUser(getCurrentUser());
+        return convert(pollRepository.save(poll));
+    }
+
 
     public PollDTO savePoll(PollDTO poll) {
         return convert(pollRepository.save(convert(poll)));

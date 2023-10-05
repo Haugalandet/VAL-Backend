@@ -20,7 +20,7 @@ public class Vote {
     private User voter;
 
     @ManyToOne
-    private PollChoice pollChoice;
+    private Choice choice;
 
     private Integer voteCount;
 

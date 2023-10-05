@@ -1,9 +1,6 @@
 package no.haugalandplus.val.rest;
 
-import no.haugalandplus.val.dto.PollChoiceDTO;
 import no.haugalandplus.val.dto.PollDTO;
-import no.haugalandplus.val.entities.PollChoice;
-import no.haugalandplus.val.service.PollChoiceService;
 import no.haugalandplus.val.service.PollService;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +12,7 @@ public class PollController {
 
     private PollService pollService;
 
-    public PollController(PollService pollService, PollChoiceService pollChoiceService) {
+    public PollController(PollService pollService) {
         this.pollService = pollService;
     }
 
@@ -30,8 +27,12 @@ public class PollController {
     }
 
     @PostMapping
+    public PollDTO createPoll(@RequestBody PollDTO poll) {
+        return pollService.createPoll(poll);
+    }
+
     @PutMapping("/{id}")
-    public PollDTO updateOrInsertPoll(@RequestBody PollDTO poll) {
+    public PollDTO updatePoll(@RequestBody PollDTO poll) {
         return pollService.savePoll(poll);
     }
 

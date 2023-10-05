@@ -1,15 +1,13 @@
 package no.haugalandplus.val.dto;
 
-import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
-import no.haugalandplus.val.entities.Poll;
 
 @Getter
 @Setter
-public class PollChoiceDTO {
+public class ChoiceDTO {
 
-    private Long pollChoiceId;
+    private Long ChoiceId;
     private long pollId;
     private String name;
     private String description;

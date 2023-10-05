@@ -22,9 +22,6 @@ public class User {
     @Setter
     private String password;
 
-    @OneToMany(mappedBy = "user")
-    private Set<Poll> polls = new HashSet<>();
-
     public User() {}
 
     public User(String username, String password) {
