@@ -77,12 +77,6 @@ public class ValApplication {
 
 		pollInstRepository.save(pollInst);
 
-		for (User u: new User[]{ martin, helene, lasse }) {
-			Vote vote = new Vote(poll, u, true);
-			voteRepository.save(vote);
-		}
-
-
 	}
 
 

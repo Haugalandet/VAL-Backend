@@ -1,6 +1,7 @@
 package no.haugalandplus.val.rest;
 
 import no.haugalandplus.val.dto.PollInstDTO;
+import no.haugalandplus.val.dto.VoteDTO;
 import no.haugalandplus.val.service.PollInstService;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,9 +33,13 @@ public class PollInstController {
         return pollInstService.save(pollInstDTO);
     }
 
-
     @DeleteMapping("/{id}")
     public PollInstDTO deletePollInst(@PathVariable Long id) {
         return pollInstService.deletePollInst(id);
+    }
+
+    @PostMapping("/{pollInstId}/votes")
+    public boolean vote(@PathVariable Long pollInstId, @RequestBody VoteDTO vote) {
+        return pollInstService.vote(pollInstId, vote);
     }
 }
