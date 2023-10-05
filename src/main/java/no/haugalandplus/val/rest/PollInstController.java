@@ -28,8 +28,12 @@ public class PollInstController {
     }
 
     @PostMapping
+    public PollInstDTO insertPollInst(@RequestBody PollInstDTO pollInstDTO, @PathVariable("poll-id") Long pollId) {
+        return pollInstService.insertPollInst(pollId, pollInstDTO);
+    }
+
     @PutMapping("/{id}")
-    public PollInstDTO insertOrUpdatePollInst(@RequestBody PollInstDTO pollInstDTO, @PathVariable("poll-id") Long pollId) {
+    public PollInstDTO updatePollInst(@RequestBody PollInstDTO pollInstDTO, @PathVariable("poll-id") Long pollId) {
         return pollInstService.save(pollId, pollInstDTO);
     }
 
@@ -39,7 +43,7 @@ public class PollInstController {
     }
 
     @PostMapping("/{pollInstId}/votes")
-    public Long vote(@PathVariable Long pollInstId, @RequestBody VoteDTO vote) {
+    public boolean vote(@PathVariable Long pollInstId, @RequestBody VoteDTO vote) {
         return pollInstService.vote(pollInstId, vote);
     }
 }

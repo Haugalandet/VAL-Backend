@@ -1,16 +1,14 @@
 package no.haugalandplus.val.service;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
 import no.haugalandplus.val.dto.ChoiceDTO;
 import no.haugalandplus.val.dto.PollInstDTO;
 import no.haugalandplus.val.dto.PollResultDTO;
 import no.haugalandplus.val.dto.VoteDTO;
+import no.haugalandplus.val.entities.Poll;
 import no.haugalandplus.val.entities.PollInst;
+import no.haugalandplus.val.entities.PollResult;
 import no.haugalandplus.val.entities.Vote;
-import no.haugalandplus.val.repository.PollInstRepository;
-import no.haugalandplus.val.repository.PollRepository;
-import no.haugalandplus.val.repository.PollResultRepository;
-import no.haugalandplus.val.repository.VoteRepository;
+import no.haugalandplus.val.repository.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -23,13 +21,15 @@ public class PollInstService extends Utils {
     private PollResultRepository pollResultRepository;
     private VoteRepository voteRepository;
     private PollRepository pollRepository;
+    private ChoiceRepository choiceRepository;
     private ModelMapper modelMapper;
 
-    public PollInstService(PollInstRepository pollInstRepository, PollResultRepository pollResultRepository, VoteRepository voteRepository, PollRepository pollRepository, ModelMapper modelMapper) {
+    public PollInstService(PollInstRepository pollInstRepository, PollResultRepository pollResultRepository, VoteRepository voteRepository, PollRepository pollRepository, ChoiceRepository choiceRepository, ModelMapper modelMapper) {
         this.pollInstRepository = pollInstRepository;
         this.pollResultRepository = pollResultRepository;
         this.voteRepository = voteRepository;
         this.pollRepository = pollRepository;
+        this.choiceRepository = choiceRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -63,6 +63,21 @@ public class PollInstService extends Utils {
         return convert(pollInstRepository.findById(id).get());
     }
 
+    public PollInstDTO insertPollInst(Long pollId, PollInstDTO pollInstDTO) {
+        PollInst pollInst = convert(pollInstDTO);
+        pollInst.setPoll(pollRepository.findById(pollId).get());
+        PollInst savedpollInst = pollInstRepository.save(pollInst);
+        List<PollResult> pollResults = choiceRepository.findAllByPoll(pollInst.getPoll()).stream()
+                .map(choice -> {
+                    PollResult pollResult = new PollResult();
+                    pollResult.setChoice(choice);
+                    pollResult.setPollInst(savedpollInst);
+                    return pollResult;
+                }).toList();
+        pollResultRepository.saveAll(pollResults);
+        return convert(savedpollInst);
+    }
+
     public PollInstDTO save(Long pollId, PollInstDTO pollInstDTO) {
         PollInst pollInst = convert(pollInstDTO);
         pollInst.setPoll(pollRepository.findById(pollId).get());
@@ -75,7 +90,7 @@ public class PollInstService extends Utils {
         return convert(pollInst);
     }
 
-    public Long vote(Long pollInstId, VoteDTO voteDTO) {
+    public boolean vote(Long pollInstId, VoteDTO voteDTO) {
         Vote vote = modelMapper.map(voteDTO, Vote.class);
         vote.setVoteId(0);
         vote.setVoter(getCurrentUser());
@@ -83,7 +98,6 @@ public class PollInstService extends Utils {
         if (vote.getVoteCount() == null || vote.getVoteCount() == 0) {
             vote.setVoteCount(1);
         }
-
-        return voteRepository.save(vote).getVoteId();
+        return true;
     }
 }
