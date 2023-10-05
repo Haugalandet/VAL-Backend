@@ -56,7 +56,7 @@ public class ValApplication {
 
 		config.setAnon(false);
 
-		Poll poll = new Poll(nils, config, "Er Nils kul?", "I denne pollen, skal man stemme på om Nils er kul!");
+		Poll poll = new Poll(nils, config);
 
 		userRepository.saveAll(Arrays.asList(nils, martin, helene, lasse));
 		configRepository.save(config);
