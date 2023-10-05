@@ -3,22 +3,20 @@ package no.haugalandplus.val.service;
 import no.haugalandplus.val.dto.UserDTO;
 import no.haugalandplus.val.entities.User;
 import no.haugalandplus.val.repository.UserRepository;
-import org.apache.el.parser.BooleanNode;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 @Service
 public class UserService {
 
     private UserRepository userRepository;
-    private long id = 0L;
-
-    public UserService(UserRepository userRepository) {
+    private PasswordEncoder passwordEncoder;
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UserDTO insertUser(User user) {
@@ -27,6 +25,7 @@ public class UserService {
             throw new RuntimeException(user.getUsername()
                     + " already exist, please choose something else!");
         }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return convertToDTO(userRepository.save(user));
     }
 

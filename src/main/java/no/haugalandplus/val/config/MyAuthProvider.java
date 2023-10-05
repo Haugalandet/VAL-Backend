@@ -7,9 +7,12 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+
+import static no.haugalandplus.val.config.SecurityConfig.passwordEncoder;
 
 @Component
 public class MyAuthProvider implements AuthenticationProvider {
@@ -17,17 +20,18 @@ public class MyAuthProvider implements AuthenticationProvider {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String providedUsername = authentication.getPrincipal().toString();
         User user = userRepository.getUserByUsername(providedUsername);
 
         String providedPassword = authentication.getCredentials().toString();
-        String correctPassword = user.getPassword();
+        String encodedPassword = user.getPassword();
 
-        // Authenticate
-        // If Passwords don't match throw and exception
-        if (!providedPassword.equals(correctPassword))
+        if (!passwordEncoder.matches(providedPassword, encodedPassword))
             throw new RuntimeException("Incorrect Credentials");
 
         // return Authentication Object
