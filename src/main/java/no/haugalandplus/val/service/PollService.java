@@ -29,7 +29,7 @@ public class PollService {
         return modelMapper.map(pollDTO, Poll.class);
     }
 
-    public List<PollDTO> getAll() {
+    public List<PollDTO> getAllPolls() {
         return pollRepository.findAll().stream().map(this::convert).toList();
     }
 

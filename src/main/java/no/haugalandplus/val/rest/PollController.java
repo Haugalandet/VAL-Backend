@@ -1,7 +1,8 @@
 package no.haugalandplus.val.rest;
 
+import no.haugalandplus.val.dto.PollChoiceDTO;
 import no.haugalandplus.val.dto.PollDTO;
-import no.haugalandplus.val.entities.Poll;
+import no.haugalandplus.val.entities.PollChoice;
 import no.haugalandplus.val.service.PollChoiceService;
 import no.haugalandplus.val.service.PollService;
 import org.springframework.web.bind.annotation.*;
@@ -14,15 +15,13 @@ public class PollController {
 
     private PollService pollService;
 
-    private PollChoiceService pollChoiceService;
-
-    public PollController(PollService pollService) {
+    public PollController(PollService pollService, PollChoiceService pollChoiceService) {
         this.pollService = pollService;
     }
 
     @GetMapping
-    public List<PollDTO> getAll() {
-        return pollService.getAll();
+    public List<PollDTO> getAllPolls() {
+        return pollService.getAllPolls();
     }
 
     @GetMapping("/{id}")
@@ -40,7 +39,5 @@ public class PollController {
     public PollDTO deletePoll(@PathVariable Long id) {
         return pollService.deletePoll(id);
     }
-
-
 
 }
