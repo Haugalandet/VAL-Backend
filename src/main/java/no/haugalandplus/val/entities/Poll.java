@@ -14,7 +14,7 @@ public class Poll {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long pollId;
+    private Long pollId;
 
     @ManyToOne
     private User user;

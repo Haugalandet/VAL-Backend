@@ -1,18 +1,17 @@
 package no.haugalandplus.val.dto;
 
-import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
-import no.haugalandplus.val.entities.Poll;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
 public class PollInstDTO {
-    private long pollInstId;
+    private Long pollInstId;
 
-    private long pollId;
+    private Long pollId;
 
     private String title;
     private String description;
@@ -21,4 +20,6 @@ public class PollInstDTO {
     private LocalDateTime endTime;
 
     private String roomCode;
+
+    private List<PollResultDTO> pollResult;
 }

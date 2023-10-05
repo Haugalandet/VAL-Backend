@@ -6,9 +6,9 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Entity
 @Getter
 @Setter
+@Entity
 public class PollInst {
 
     @Id
@@ -25,4 +25,6 @@ public class PollInst {
     private LocalDateTime endTime;
 
     private String roomCode;
+
+    public PollInst() {}
 }
