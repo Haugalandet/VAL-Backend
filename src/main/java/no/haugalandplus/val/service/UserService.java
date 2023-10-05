@@ -40,7 +40,7 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
-    public UserDTO updateUsers(UserDTO userDTO) {
+    public UserDTO updateUser(UserDTO userDTO) {
         Boolean existing = userRepository.existsById(userDTO.getUserId());
         if(!existing) {
             throw new NoSuchElementException("User with ID: "
@@ -50,9 +50,7 @@ public class UserService {
         User existingUser = userRepository.findById(userDTO.getUserId()).get();
 
         existingUser.setPassword(existingUser.getPassword());
-
         existingUser.setUsername(updatedUser.getUsername());
-
         return convertToDTO(existingUser);
     }
 

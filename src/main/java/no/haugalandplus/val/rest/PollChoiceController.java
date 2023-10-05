@@ -1,12 +1,39 @@
 package no.haugalandplus.val.rest;
 
-import no.haugalandplus.val.repository.PollChoiceRepository;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import no.haugalandplus.val.dto.PollChoiceDTO;
+import no.haugalandplus.val.service.PollChoiceService;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/poll-choices")
 public class PollChoiceController {
 
-    private PollChoiceRepository pollChoiceRepository;
+    private PollChoiceService pollChoiceService;
+
+    public PollChoiceController(PollChoiceService pollChoiceService) {
+        this.pollChoiceService = pollChoiceService;
+    }
+
+    @GetMapping
+    public List<PollChoiceDTO> getAllPollChoices() {
+        return pollChoiceService.getAll();
+    }
+
+    @GetMapping("/{id}")
+    public PollChoiceDTO getPollChoice(@PathVariable Long id) {
+        return pollChoiceService.get(id);
+    }
+
+    @PostMapping
+    @PutMapping("/{id}")
+    public PollChoiceDTO createPollChoice(@RequestBody PollChoiceDTO pollChoice) {
+        return pollChoiceService.saveOrUpdate(pollChoice);
+    }
+
+    @DeleteMapping("/{id}")
+    public PollChoiceDTO deletePollChoice(@PathVariable Long id) {
+        return pollChoiceService.delete(id);
+    }
 }

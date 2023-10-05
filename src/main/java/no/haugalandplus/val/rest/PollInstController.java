@@ -32,7 +32,6 @@ public class PollInstController {
         return pollInstService.save(pollInstDTO);
     }
 
-
     @DeleteMapping("/{id}")
     public PollInstDTO deletePollInst(@PathVariable Long id) {
         return pollInstService.deletePollInst(id);

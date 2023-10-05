@@ -31,7 +31,7 @@
 
         @PutMapping("/{id}")
         public UserDTO updateUser(@RequestBody UserDTO user) {
-            return userservice.updateUsers(user);
+            return userservice.updateUser(user);
         }
 
         @GetMapping("/{id}")
