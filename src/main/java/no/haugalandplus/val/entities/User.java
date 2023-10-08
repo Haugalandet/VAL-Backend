@@ -11,6 +11,7 @@ import java.util.Set;
 @Entity
 public class User {
 
+    @Setter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long userId;
@@ -20,9 +21,6 @@ public class User {
 
     @Setter
     private String password;
-
-    @OneToMany(mappedBy = "user")
-    private Set<Poll> polls = new HashSet<>();
 
     public User() {}
 

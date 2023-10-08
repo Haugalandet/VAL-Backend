@@ -1,27 +1,22 @@
 package no.haugalandplus.val.entities;
 
-
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+@Entity
 @Getter
 @Setter
-@Entity
-public class Vote {
+public class Choice {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long voteId;
+    private Long ChoiceId;
 
     @ManyToOne
-    private PollInst pollInst;
+    private Poll poll;
 
-    @ManyToOne
-    private User voter;
-
-    @ManyToOne
-    private Choice choice;
-
-    private Integer voteCount;
+    private String name;
+    private String description;
 
 }

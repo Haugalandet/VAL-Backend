@@ -4,28 +4,27 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Entity
-public class Config {
+public class PollInst {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long configId;
+    private long pollInstId;
 
     @ManyToOne
-    private User owner;
+    private Poll poll;
 
     private String name;
-
     private String description;
 
-    private boolean anon;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
 
-    public Config(User owner) {
-        this.owner = owner;
-        anon = true;
-    }
+    private String roomCode;
 
-    public Config() {}
+    public PollInst() {}
 }
