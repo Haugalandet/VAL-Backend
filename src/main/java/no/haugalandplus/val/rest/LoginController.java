@@ -1,13 +1,17 @@
 package no.haugalandplus.val.rest;
 
+import no.haugalandplus.val.config.JwtTokenAuthenticationFilter;
+import no.haugalandplus.val.config.JwtTokenUtil;
 import no.haugalandplus.val.dto.LoginDTO;
 
+import no.haugalandplus.val.entities.User;
+import org.springframework.context.annotation.Description;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -21,11 +25,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginController {
 
     private AuthenticationManager authenticationManager;
+    private JwtTokenUtil JwtTokenUtil;
 
-    public LoginController(AuthenticationManager authenticationManager) {
+    public LoginController(AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil) {
         this.authenticationManager = authenticationManager;
+        JwtTokenUtil = jwtTokenUtil;
     }
 
+    /**
+     * Returns with an authentication token in the header.
+     */
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginDTO user) {
         try {
@@ -38,10 +47,12 @@ public class LoginController {
             // Attempt to authenticate the user.
             Authentication authResult = authenticationManager.authenticate(authentication);
 
-            // Set the authenticated user's security context.
-            SecurityContextHolder.getContext().setAuthentication(authResult);
+            // Creates a token that the user can use
+            String token = JwtTokenUtil.createJWT((User) authResult.getPrincipal());
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", "Bearer " + token);
 
-            return ResponseEntity.ok("Authentication successful");
+            return ResponseEntity.ok().headers(headers).body("Authentication successful");
         } catch (AuthenticationException e) {
             // Handle authentication failure (e.g., invalid credentials).
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed");

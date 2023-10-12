@@ -34,6 +34,11 @@ dependencies {
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	implementation("io.jsonwebtoken:jjwt-api:0.12.2")
+	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.2")
+	runtimeOnly("io.jsonwebtoken:jjwt-orgjson:0.12.2")
+	testImplementation("org.hamcrest:hamcrest:2.1")
+
 }
 
 tasks.withType<Test> {
