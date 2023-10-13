@@ -1,5 +1,7 @@
 package no.haugalandplus.val.config;
 
+import no.haugalandplus.val.auth.JwtTokenAuthenticationFilter;
+import no.haugalandplus.val.auth.JwtTokenUtil;
 import no.haugalandplus.val.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,7 +42,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authz) -> authz
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .addFilterBefore(new JwtTokenAuthenticationFilter(userRepository, jwtTokenUtil), UsernamePasswordAuthenticationFilter.class)
                 .csrf((csrf) -> csrf.disable())

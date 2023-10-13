@@ -1,0 +1,94 @@
+package no.haugalandplus.val.auth;
+
+import io.jsonwebtoken.Claims;
+import no.haugalandplus.val.entities.User;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+@SpringBootTest
+class JwtTokenUtilTest {
+
+    @MockBean
+    private TokenRevocationRepository tokenRevocationRepository;
+    private String testName;
+    private long userId;
+    private User user;
+    private JwtTokenUtil jwt;
+
+    @BeforeEach
+    public void init() {
+        testName = "Ole Jonny";
+        userId = 34;
+
+        user = new User();
+        user.setUsername(testName);
+        user.setUserId(userId);
+
+        jwt = new JwtTokenUtil(tokenRevocationRepository);
+    }
+
+    @Test
+    public void testValidation() {
+        String token = jwt.createJWT(user.getUserId());
+
+        Claims claims = jwt.isExpired(token);
+
+        assertThat(claims.getSubject(), is(userId + ""));
+    }
+
+    @Test
+    public void testExpired() {
+        // Change the time expireTime, so that the token is already expired.
+        ReflectionTestUtils.setField(jwt, "expireTime", -1000L);
+
+        String token = jwt.createJWT(user.getUserId());
+
+        try {
+            jwt.isExpired(token);
+            fail();
+        } catch (Exception e) {
+            assertThat(e, instanceOf(BadCredentialsException.class));
+        }
+    }
+
+    @Test
+    public void testNonValidToken() {
+        JwtTokenUtil jwt = new JwtTokenUtil(tokenRevocationRepository);
+
+        // Changing the token
+        String token = jwt.createJWT(user.getUserId()) + "UwU";
+
+        try {
+            jwt.isExpired(token);
+            fail();
+        } catch (Exception e) {
+            assertThat(e, instanceOf(BadCredentialsException.class));
+        }
+    }
+
+    @Test
+    public void testRevokedToken() {
+        // Make the test believe that it already exists.
+        when(tokenRevocationRepository.existsByJwtId(any(String.class))).thenReturn(true);
+
+        String token = jwt.createJWT(user.getUserId());
+
+        try {
+            jwt.isExpired(token);
+            fail();
+        } catch (Exception e) {
+            assertThat(e, instanceOf(BadCredentialsException.class));
+        }
+    }
+}

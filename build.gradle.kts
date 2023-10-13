@@ -30,6 +30,7 @@ dependencies {
 	implementation("org.springframework.security:spring-security-core:6.1.4")
 	implementation("org.springframework.security:spring-security-config:6.1.4")
 	implementation("org.springframework.security:spring-security-web:6.1.4")
+	testImplementation("junit:junit:4.13.1")
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	annotationProcessor("org.projectlombok:lombok")
@@ -38,7 +39,6 @@ dependencies {
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.2")
 	runtimeOnly("io.jsonwebtoken:jjwt-orgjson:0.12.2")
 	testImplementation("org.hamcrest:hamcrest:2.1")
-
 }
 
 tasks.withType<Test> {

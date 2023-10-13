@@ -1,4 +1,4 @@
-package no.haugalandplus.val.config;
+package no.haugalandplus.val.auth;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -40,15 +40,12 @@ public class JwtTokenAuthenticationFilter extends OncePerRequestFilter {
 
         if (token != null) {
             try {
-                // Checks that it is valid
-                Claims claims = jwtTokenUtil.claimsFromJwt(token);
 
                 // Adds user to security context
-                String username = claims.getSubject();
-                User user = userRepository.findById(Long.parseLong(username)).get();
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+                Claims claims = jwtTokenUtil.isExpired(token);
+                User user = userRepository.findById(Long.parseLong(claims.getSubject())).get();
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, claims, new ArrayList<>());
                 SecurityContextHolder.getContext().setAuthentication(auth);
-
             } catch (Exception e) {
                 // TODO get a proper error message
             }
@@ -59,7 +56,7 @@ public class JwtTokenAuthenticationFilter extends OncePerRequestFilter {
     private String extractToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
+            return bearerToken;
         }
         return null;
     }
