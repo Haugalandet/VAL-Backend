@@ -16,7 +16,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- * Filter used to add security context
+ * Filter used to for checking if someone is authenticated, and
+ * if so, adds the user to the security context
  */
 @Component
 public class JwtTokenAuthenticationFilter extends OncePerRequestFilter {

@@ -8,14 +8,17 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service used to manage JWR tokens.
+ */
 @Service
-public class AuthService extends Utils {
+public class TokenService extends Utils {
 
-    private AuthenticationManager authenticationManager;
-    private JwtTokenUtil jwrTokenUtil;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenUtil jwrTokenUtil;
 
 
-    public AuthService(AuthenticationManager authenticationManager, JwtTokenUtil jwrTokenUtil) {
+    public TokenService(AuthenticationManager authenticationManager, JwtTokenUtil jwrTokenUtil) {
         this.authenticationManager = authenticationManager;
         this.jwrTokenUtil = jwrTokenUtil;
     }

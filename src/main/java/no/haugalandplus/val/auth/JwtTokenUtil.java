@@ -15,14 +15,14 @@ import java.util.UUID;
 
 
 /**
- * Used for creating and validating the Jwt token.
+ * Used for creating and validating the Jwt token. Also manages
+ * the token blacklist (revoked tokens)
  */
 @Component
 public class JwtTokenUtil {
 
     private final SecretKey secretKey = Jwts.SIG.HS256.key().build();
     private final Long expireTime = 15 * 60 * 1000L;
-
     private TokenRevocationRepository tokenRevocationRepository;
 
     @Autowired

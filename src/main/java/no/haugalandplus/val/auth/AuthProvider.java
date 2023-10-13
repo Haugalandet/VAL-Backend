@@ -11,6 +11,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 
+/**
+ * Class used to check if the username and passwords are correct
+ */
 @Component
 public class AuthProvider implements AuthenticationProvider {
 
