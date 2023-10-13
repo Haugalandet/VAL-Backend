@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -69,5 +70,10 @@ public class JwtTokenUtil {
         Claims claims = (Claims) SecurityContextHolder.getContext().getAuthentication().getCredentials();
         TokenRevocation tr = new TokenRevocation(claims.getId(), new Date());
         tokenRevocationRepository.save(tr);
+    }
+
+    @Scheduled(fixedRate = 6 * 60 * 60 * 1000)
+    public void deleteExpired() {
+        tokenRevocationRepository.deleteAllByExpirationTimeBefore(new Date(System.currentTimeMillis() - expireTime));
     }
 }
