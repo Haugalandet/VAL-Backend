@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -16,16 +17,13 @@ public class Poll {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pollId;
 
+    private String name;
+    private String description;
+    private boolean anon;
+
     @ManyToOne
     private User user;
 
-    @ManyToOne
-    private Config config;
-
-    public Poll(User user, Config config) {
-        this.user = user;
-        this.config = config;
-    }
 
     public Poll() {}
 }

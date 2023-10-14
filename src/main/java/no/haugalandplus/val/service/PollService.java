@@ -2,9 +2,7 @@ package no.haugalandplus.val.service;
 
 import no.haugalandplus.val.dto.PollDTO;
 import no.haugalandplus.val.entities.Poll;
-import no.haugalandplus.val.repository.ConfigRepository;
 import no.haugalandplus.val.repository.PollRepository;
-import no.haugalandplus.val.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 

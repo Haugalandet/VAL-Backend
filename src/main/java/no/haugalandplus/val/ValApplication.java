@@ -27,8 +27,6 @@ public class ValApplication {
 		return modelMapper;
 	}
 
-	private static ConfigRepository configRepository;
-
 	private static PollRepository pollRepository;
 
 	private static UserRepository userRepository;

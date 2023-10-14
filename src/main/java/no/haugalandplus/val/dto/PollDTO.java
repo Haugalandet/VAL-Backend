@@ -9,4 +9,7 @@ public class PollDTO {
     private long pollId;
     private long userId;
     private long configId;
+    private String name;
+    private String description;
+    private boolean anon;
 }
