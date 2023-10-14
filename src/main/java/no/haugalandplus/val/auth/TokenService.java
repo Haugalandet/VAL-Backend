@@ -2,7 +2,7 @@ package no.haugalandplus.val.auth;
 
 import no.haugalandplus.val.dto.LoginDTO;
 import no.haugalandplus.val.entities.User;
-import no.haugalandplus.val.service.Utils;
+import no.haugalandplus.val.service.ServiceUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * Service used to manage JWR tokens.
  */
 @Service
-public class TokenService extends Utils {
+public class TokenService extends ServiceUtils {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwrTokenUtil;
