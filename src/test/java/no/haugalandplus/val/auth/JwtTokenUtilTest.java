@@ -4,22 +4,24 @@ import io.jsonwebtoken.Claims;
 import no.haugalandplus.val.entities.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import java.util.ArrayList;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class JwtTokenUtilTest {
 
-    @MockBean
+    @Autowired
     private TokenRevocationRepository tokenRevocationRepository;
     private String testName;
     private long userId;
@@ -79,10 +81,14 @@ class JwtTokenUtilTest {
 
     @Test
     public void testRevokedToken() {
-        // Make the test believe that it already exists.
-        when(tokenRevocationRepository.existsByJwtId(any(String.class))).thenReturn(true);
-
         String token = jwt.createJWT(user.getUserId());
+
+        Claims claims = jwt.isExpired(token);
+
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, claims, new ArrayList<>());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        jwt.expire();
 
         try {
             jwt.isExpired(token);

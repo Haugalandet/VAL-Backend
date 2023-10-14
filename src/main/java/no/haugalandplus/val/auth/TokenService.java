@@ -4,6 +4,7 @@ import no.haugalandplus.val.dto.LoginDTO;
 import no.haugalandplus.val.entities.User;
 import no.haugalandplus.val.service.Utils;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -30,8 +31,14 @@ public class TokenService extends Utils {
                 user.getPassword()
         );
 
+        Authentication authResult;
+
         // Attempt to authenticate the user.
-        Authentication authResult = authenticationManager.authenticate(authentication);
+        try {
+            authResult = authenticationManager.authenticate(authentication);
+        } catch (Exception e) {
+            throw new BadCredentialsException("Not able to log in");
+        }
 
         // Creates a token that the user can use
         return jwrTokenUtil.createJWT(((User) authResult.getPrincipal()).getUserId());

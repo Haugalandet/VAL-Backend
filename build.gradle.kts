@@ -39,6 +39,7 @@ dependencies {
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.2")
 	runtimeOnly("io.jsonwebtoken:jjwt-orgjson:0.12.2")
 	testImplementation("org.hamcrest:hamcrest:2.1")
+	testImplementation("org.mockito:mockito-core:3.12.4")
 }
 
 tasks.withType<Test> {
