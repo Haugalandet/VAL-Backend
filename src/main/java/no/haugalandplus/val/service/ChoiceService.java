@@ -36,7 +36,7 @@ public class ChoiceService {
 
     public ChoiceDTO saveOrUpdate(Long pollId, ChoiceDTO choiceDTO) {
         Choice choice = convertFromDTO(choiceDTO);
-        choice.setPoll(pollRepository.findById(pollId).get());
+//        choice.setPoll(pollRepository.findById(pollId).get());
         return convertToDTO(choiceRepository.save(choice));
     }
 

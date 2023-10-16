@@ -1,19 +1,24 @@
 package no.haugalandplus.val;
 
-import no.haugalandplus.val.dto.PollInstDTO;
-import no.haugalandplus.val.entities.*;
-import no.haugalandplus.val.repository.*;
-import no.haugalandplus.val.service.PollInstService;
+import no.haugalandplus.val.dto.ChoiceDTO;
+import no.haugalandplus.val.dto.PollDTO;
+import no.haugalandplus.val.entities.Choice;
+import no.haugalandplus.val.entities.Poll;
+import no.haugalandplus.val.entities.User;
+import no.haugalandplus.val.repository.PollInstRepository;
+import no.haugalandplus.val.repository.PollRepository;
+import no.haugalandplus.val.repository.UserRepository;
+import no.haugalandplus.val.repository.VoteRepository;
+import no.haugalandplus.val.service.UserService;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.PropertyMap;
-import org.modelmapper.convention.MatchingStrategies;
+import org.modelmapper.TypeToken;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.core.parameters.P;
 
-import java.util.Arrays;
+import java.lang.reflect.Type;
+import java.util.List;
 
 @SpringBootApplication
 public class ValApplication {
@@ -31,6 +36,9 @@ public class ValApplication {
 
 	private static UserRepository userRepository;
 
+	private static UserService userService;
+
+
 	private static VoteRepository voteRepository;
 
 	private static PollInstRepository pollInstRepository;
@@ -43,7 +51,7 @@ public class ValApplication {
 
 //		configRepository = context.getBean(ConfigRepository.class);
 //		pollRepository = context.getBean(PollRepository.class);
-//		userRepository = context.getBean(UserRepository.class);
+		userService = context.getBean(UserService.class);
 //		voteRepository = context.getBean(VoteRepository.class);
 //		pollInstRepository = context.getBean(PollInstRepository.class);
 //
@@ -51,7 +59,9 @@ public class ValApplication {
 //		// Creates test data
 //
 //		User nils = new User("NilsMichael", "Fitjar");
-//		User martin = new User("MartinTunge", "Sterri");
+		User user = new User("adm", "pas");
+
+		userService.insertUser(user);
 //		User helene = new User("HeleneSineNotatarHubert", "Solhaug");
 //		User lasse = new User("LasseLarsMartin", "Taraldset");
 //

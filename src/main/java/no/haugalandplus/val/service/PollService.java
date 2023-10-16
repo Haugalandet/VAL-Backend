@@ -1,6 +1,8 @@
 package no.haugalandplus.val.service;
 
+import no.haugalandplus.val.dto.ChoiceDTO;
 import no.haugalandplus.val.dto.PollDTO;
+import no.haugalandplus.val.entities.Choice;
 import no.haugalandplus.val.entities.Poll;
 import no.haugalandplus.val.repository.PollRepository;
 import org.modelmapper.ModelMapper;

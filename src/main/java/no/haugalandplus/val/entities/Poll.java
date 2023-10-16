@@ -4,12 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-@Getter
-@Setter
 @Entity
 public class Poll {
 
@@ -24,6 +20,55 @@ public class Poll {
     @ManyToOne
     private User user;
 
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "choice_poll_id")
+    private List<Choice> choices;
 
-    public Poll() {}
+    public Long getPollId() {
+        return pollId;
+    }
+
+    public void setPollId(Long pollId) {
+        this.pollId = pollId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public boolean isAnon() {
+        return anon;
+    }
+
+    public void setAnon(boolean anon) {
+        this.anon = anon;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public List<Choice> getChoices() {
+        return choices;
+    }
+
+    public void setChoices(List<Choice> choices) {
+        this.choices = choices;
+    }
 }

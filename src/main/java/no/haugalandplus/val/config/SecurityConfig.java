@@ -33,6 +33,10 @@ public class SecurityConfig {
                 )
                 .httpBasic(Customizer.withDefaults())
                 .csrf((csrf) -> csrf.disable());
+        http.headers(httpSecurityHeadersConfigurer ->
+                httpSecurityHeadersConfigurer.frameOptions(
+                        frameOptionsConfig ->
+                                frameOptionsConfig.disable()));
         return http.build();
     }
 }
