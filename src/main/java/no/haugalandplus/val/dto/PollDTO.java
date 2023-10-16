@@ -9,7 +9,7 @@ import java.util.List;
 @Setter
 public class PollDTO {
     private long pollId;
-    private long userId;
+    //private long userId;
     private String name;
     private String description;
     private boolean anon;
