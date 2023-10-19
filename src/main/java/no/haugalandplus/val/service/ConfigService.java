@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class ConfigService extends Utils {
+public class ConfigService extends ServiceUtils {
 
     private ConfigRepository configRepository;
     private UserRepository userRepository;

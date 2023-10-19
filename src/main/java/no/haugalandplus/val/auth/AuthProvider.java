@@ -1,8 +1,7 @@
-package no.haugalandplus.val.config;
+package no.haugalandplus.val.auth;
 
 import no.haugalandplus.val.entities.User;
 import no.haugalandplus.val.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -12,16 +11,19 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 
-import static no.haugalandplus.val.config.SecurityConfig.passwordEncoder;
-
+/**
+ * Class used to check if the username and passwords are correct
+ */
 @Component
-public class MyAuthProvider implements AuthenticationProvider {
+public class AuthProvider implements AuthenticationProvider {
 
-    @Autowired
     private UserRepository userRepository;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
+
+    public AuthProvider(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
