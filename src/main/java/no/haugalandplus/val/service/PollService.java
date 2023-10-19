@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class PollService extends Utils {
+public class PollService extends ServiceUtils {
 
     private PollRepository pollRepository;
     private ModelMapper modelMapper;

@@ -4,7 +4,6 @@ import no.haugalandplus.val.dto.ChoiceDTO;
 import no.haugalandplus.val.dto.PollInstDTO;
 import no.haugalandplus.val.dto.PollResultDTO;
 import no.haugalandplus.val.dto.VoteDTO;
-import no.haugalandplus.val.entities.Poll;
 import no.haugalandplus.val.entities.PollInst;
 import no.haugalandplus.val.entities.PollResult;
 import no.haugalandplus.val.entities.Vote;
@@ -15,7 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class PollInstService extends Utils {
+public class PollInstService extends ServiceUtils {
 
     private PollInstRepository pollInstRepository;
     private PollResultRepository pollResultRepository;
