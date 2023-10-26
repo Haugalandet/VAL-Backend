@@ -14,4 +14,7 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
 
     List<Vote> findAllByChoiceAndPollInst(Choice choice, PollInst pollInst);
 
+    @Query("select coalesce(sum(v.voteCount), 0) from Vote v where v.choice.ChoiceId = :choice and v.pollInst = :pollInst")
+    Long sumOfVotesByChoiceIdAndPollInstId(
+            @Param("choice") Long choice, @Param("pollInst") PollInst pollInst);
 }

@@ -11,6 +11,7 @@ import no.haugalandplus.val.repository.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -40,10 +41,7 @@ public class PollInstService extends ServiceUtils {
                 .map(r -> {
                     PollResultDTO pollResultDTO = modelMapper.map(r, PollResultDTO.class);
                     pollResultDTO.setPollChoice(modelMapper.map(r.getChoice(), ChoiceDTO.class));
-                    pollResultDTO.setTotalCount(voteRepository.findAllByChoiceAndPollInst(r.getChoice(), pollInst)
-                            .stream()
-                            .reduce(0,(a, b) -> a + b.getVoteCount(), Integer::sum)
-                    );
+                    pollResultDTO.setTotalCount(voteRepository.sumOfVotesByChoiceIdAndPollInstId(r.getChoice().getChoiceId(), pollInst));
                     return pollResultDTO;
                 }).toList());
 
@@ -54,8 +52,8 @@ public class PollInstService extends ServiceUtils {
         return modelMapper.map(pollInstDTO, PollInst.class);
     }
 
-    public List<PollInstDTO> getAllPollInsts() {
-        return pollInstRepository.findAll().stream().map(this::convert).toList();
+    public List<PollInstDTO> getAllPollInsts(Long pollId) {
+        return pollInstRepository.findAllByPollId(pollId).stream().map(this::convert).toList();
     }
 
     public PollInstDTO getPollInst(Long id) {
@@ -65,7 +63,10 @@ public class PollInstService extends ServiceUtils {
     public PollInstDTO insertPollInst(Long pollId, PollInstDTO pollInstDTO) {
         PollInst pollInst = convert(pollInstDTO);
         pollInst.setPoll(pollRepository.findById(pollId).get());
+        pollInst = pollInstRepository.save(pollInst);
+        pollInst.setRoomCode(generateRoomCode(pollInst.getPollInstId()));
         PollInst savedpollInst = pollInstRepository.save(pollInst);
+
         List<PollResult> pollResults = choiceRepository.findAllByPoll(pollInst.getPoll()).stream()
                 .map(choice -> {
                     PollResult pollResult = new PollResult();
@@ -97,6 +98,40 @@ public class PollInstService extends ServiceUtils {
         if (vote.getVoteCount() == null || vote.getVoteCount() == 0) {
             vote.setVoteCount(1);
         }
+        voteRepository.save(vote);
         return true;
+    }
+
+    public PollInstDTO start(Long pollInstId) {
+        PollInst pollInst = pollInstRepository.findById(pollInstId).get();
+        pollInst.setStartTime(new Date());
+        return convert(pollInstRepository.save(pollInst));
+    }
+
+    public PollInstDTO end(Long pollInstId) {
+        PollInst pollInst = pollInstRepository.findById(pollInstId).get();
+        pollInst.setEndTime(new Date());
+        return convert(pollInstRepository.save(pollInst));
+    }
+
+    /**
+     * Algorithm that generates unique room codes for
+     * every id.
+     * @param id
+     * @return roomCode
+     */
+    private String generateRoomCode(Long id) {
+        long largePrime = 1207571;
+        long xorMask = 98765;
+        long pow = 6;
+        if (id >= Math.pow(10, pow)) {
+            while (Math.pow(10, pow) <= id) {
+                pow += 1;
+            }
+        }
+        long code = id;
+        code = code ^ xorMask;
+        code = ((code * largePrime) % (long) Math.pow(10, pow));
+        return String.format("%0"+pow+"d", code);
     }
 }

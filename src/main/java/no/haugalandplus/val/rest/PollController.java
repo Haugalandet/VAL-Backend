@@ -17,8 +17,8 @@ public class PollController {
     }
 
     @GetMapping
-    public List<PollDTO> getAllPolls() {
-        return pollService.getAllPolls();
+    public List<PollDTO> getAllPollsByCurrentUser() {
+        return pollService.getAllPollsByCurrentUser();
     }
 
     @GetMapping("/{id}")
@@ -31,10 +31,10 @@ public class PollController {
         return pollService.createPoll(poll);
     }
 
-    @PutMapping("/{id}")
-    public PollDTO updatePoll(@RequestBody PollDTO poll) {
-        return pollService.savePoll(poll);
-    }
+//    @PutMapping("/{id}")
+//    public PollDTO updatePoll(@RequestBody PollDTO poll) {
+//        return pollService.savePoll(poll);
+//    }
 
     @DeleteMapping("/{id}")
     public PollDTO deletePoll(@PathVariable Long id) {

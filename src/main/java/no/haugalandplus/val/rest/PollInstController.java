@@ -18,8 +18,8 @@ public class PollInstController {
     }
 
     @GetMapping
-    public List<PollInstDTO> getAllPollInsts() {
-        return pollInstService.getAllPollInsts();
+    public List<PollInstDTO> getAllPollInsts(@PathVariable("poll-id") Long pollId) {
+        return pollInstService.getAllPollInsts(pollId);
     }
 
     @GetMapping("/{id}")
@@ -45,5 +45,15 @@ public class PollInstController {
     @PostMapping("/{pollInstId}/votes")
     public boolean vote(@PathVariable Long pollInstId, @RequestBody VoteDTO vote) {
         return pollInstService.vote(pollInstId, vote);
+    }
+
+    @PostMapping("/{pollInstId}/start")
+    public PollInstDTO startPollInst(@PathVariable Long pollInstId) {
+        return pollInstService.start(pollInstId);
+    }
+
+    @PostMapping("/{pollInstId}/end")
+    public PollInstDTO endPollInst(@PathVariable Long pollInstId) {
+        return pollInstService.end(pollInstId);
     }
 }

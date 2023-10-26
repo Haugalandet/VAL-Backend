@@ -1,5 +1,6 @@
 package no.haugalandplus.val.service;
 
+import no.haugalandplus.val.dto.CreateUserDTO;
 import no.haugalandplus.val.dto.UserDTO;
 import no.haugalandplus.val.entities.User;
 import no.haugalandplus.val.repository.UserRepository;
@@ -19,13 +20,15 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public UserDTO insertUser(User user) {
-        User existing = userRepository.getUserByUsername(user.getUsername());
+    public UserDTO insertUser(CreateUserDTO userDTO) {
+        User existing = userRepository.getUserByUsername(userDTO.getUsername());
         if(existing != null) {
-            throw new RuntimeException(user.getUsername()
+            throw new RuntimeException(existing.getUsername()
                     + " already exist, please choose something else!");
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User user = new User();
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setUsername(userDTO.getUsername());
         return convertToDTO(userRepository.save(user));
     }
 
