@@ -41,7 +41,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((authz) -> authz
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                        .requestMatchers("/users").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtTokenAuthenticationFilter(userRepository, jwtTokenUtil), UsernamePasswordAuthenticationFilter.class)
