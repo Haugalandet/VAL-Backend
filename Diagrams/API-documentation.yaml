@@ -1,0 +1,608 @@
+openapi: "3.0.3"
+info:
+  title: "val API"
+  description: "val API"
+  version: "1.0.0"
+servers:
+  - url: "https://val"
+paths:
+  /users:
+    post:
+      summary: "Create new user"
+      operationId: "createUser"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+  /users/{id}:
+    get:
+      summary: "Get user information"
+      operationId: "getUser"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: jwt
+          required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+    put:
+      summary: "Change user"
+      operationId: "updateUser"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: false
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: jwt
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+    delete:
+      summary: "Delete user"
+      operationId: "deleteUser"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: jwt
+          required: true
+      responses:
+        "200":
+          description: "OK"
+  /polls:
+    get:
+      summary: "Get polls of current user"
+      operationId: "getAllPollsByCurrentUser"
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: jwt
+          required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/PollDTO"
+    post:
+      summary: "Creat polls"
+      operationId: "createPoll"
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: jwt
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PollDTORequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PollDTO"
+  /polls/{id}:
+    get:
+      summary: "Get poll"
+      operationId: "getPoll"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: jwt
+          required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PollDTO"
+    delete:
+      summary: "delete poll"
+      operationId: "deletePoll"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: jwt
+          required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PollDTO"
+  /polls/{poll-id}/instances:
+    get:
+      summary: "Get instances of poll"
+      operationId: "getAllPollInsts"
+      parameters:
+        - name: "poll-id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: jwt
+          required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/PollInstDTO"
+    post:
+      summary: "Creat poll instance"
+      operationId: "insertPollInst"
+      parameters:
+        - name: "poll-id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: jwt
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PollInstDTORequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PollInstDTO"
+  /polls/{poll-id}/instances/{id}:
+    get:
+      summary: "Get specific poll instance"
+      operationId: "getPollInst"
+      parameters:
+        - name: "poll-id"
+          in: "path"
+          required: false
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PollInstDTO"
+    put:
+      summary: "Cange poll instance (meant for time changes)"
+      operationId: "updatePollInst"
+      parameters:
+        - name: "poll-id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "id"
+          in: "path"
+          required: false
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: jwt
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PollInstDTOUpdate"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PollInstDTO"
+    delete:
+      summary: "Delete poll instance"
+      operationId: "deletePollInst"
+      parameters:
+        - name: "poll-id"
+          in: "path"
+          required: false
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: jwt
+          required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PollInstDTO"
+  /polls/{poll-id}/instances/{pollInstId}/end:
+    post:
+      summary: "End poll"
+      operationId: "endPollInst"
+      parameters:
+        - name: "poll-id"
+          in: "path"
+          required: false
+        - name: "pollInstId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: jwt
+          required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PollInstDTO"
+  /polls/{poll-id}/instances/{pollInstId}/start:
+    post:
+      summary: "Start poll"
+      operationId: "startPollInst"
+      parameters:
+        - name: "poll-id"
+          in: "path"
+          required: false
+        - name: "pollInstId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: jwt
+          required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PollInstDTO"
+  /polls/{poll-id}/instances/{pollInstId}/votes:
+    post:
+      summary: "Vote"
+      operationId: "vote"
+      parameters:
+        - name: "poll-id"
+          in: "path"
+          required: false
+        - name: "pollInstId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: jwt
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VoteDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "boolean"
+  /auth/login:
+    post:
+      summary: "Login (get auth token)"
+      operationId: "login"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          headers:
+            Authorization:
+              schema:
+                type: string
+                format: jwt
+          content:
+            '*/*':
+              schema:
+                type: "string"
+  /auth/logout:
+    post:
+      summary: "Logout"
+      operationId: "signOut"
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: jwt
+          required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+  /auth/refresh:
+    post:
+      summary: "Refresh token"
+      operationId: "login"
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: jwt
+          required: true
+      responses:
+        "200":
+          description: "OK"
+          headers:
+            Authorization:
+              schema:
+                type: string
+                format: jwt
+          content:
+            '*/*':
+              schema:
+                type: "string"
+components:
+  schemas:
+    CreateUserDTO:
+      type: "object"
+      properties:
+        username:
+          type: "string"
+        password:
+          type: "string"
+    UserDTO:
+      type: "object"
+      properties:
+        userId:
+          type: "integer"
+        username:
+          type: "string"
+    ChoiceDTO:
+      type: "object"
+      properties:
+        ChoiceId:
+          type: "integer"
+          format: "int64"
+        name:
+          type: "string"
+        description:
+          type: "string"
+    ChoiceDTORequest:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        description:
+          type: "string"
+    PollResultDTO:
+      type: "object"
+      properties:
+        pollChoice:
+          $ref: "#/components/schemas/ChoiceDTO"
+        totalCount:
+          type: "integer"
+          format: "int64"
+    PollInstDTO:
+      type: "object"
+      properties:
+        pollInstId:
+          type: "integer"
+          format: "int64"
+        pollId:
+          type: "integer"
+          format: "int64"
+        name:
+          type: "string"
+        description:
+          type: "string"
+        startTime:
+          type: "string"
+          format: "date-time"
+        endTime:
+          type: "string"
+          format: "date-time"
+        roomCode:
+          type: "string"
+        pollResult:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/PollResultDTO"
+    PollInstDTORequest:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        description:
+          type: "string"
+        startTime:
+          type: "string"
+          format: "date-time"
+        endTime:
+          type: "string"
+          format: "date-time"
+    PollInstDTOUpdate:
+      type: "object"
+      properties:
+        pollInstId:
+          type: "integer"
+          format: "int64"
+        name:
+          type: "string"
+        description:
+          type: "string"
+        startTime:
+          type: "string"
+          format: "date-time"
+        endTime:
+          type: "string"
+          format: "date-time"
+    VoteDTO:
+      type: "object"
+      properties:
+        choiceId:
+          type: "integer"
+          format: "int64"
+        voteCount:
+          type: "integer"
+          format: "int64"
+    PollDTO:
+      type: "object"
+      properties:
+        pollId:
+          type: "integer"
+          format: "int64"
+        name:
+          type: "string"
+        description:
+          type: "string"
+        anon:
+          type: "boolean"
+        choices:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ChoiceDTO"
+    PollDTORequest:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        description:
+          type: "string"
+        anon:
+          type: "boolean"
+        choices:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ChoiceDTORequest"
+    LoginDTO:
+      type: "object"
+      properties:
+        username:
+          type: "string"
+        password:
+          type: "string"
