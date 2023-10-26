@@ -61,7 +61,7 @@ public class SecurityConfig {
                 )
                 .addFilterBefore(new JwtTokenAuthenticationFilter(userRepository, jwtTokenUtil), UsernamePasswordAuthenticationFilter.class)
                 .csrf((csrf) -> csrf.disable())
-                //.cors((cors) -> cors.)
+                //.cors((cors) -> cors.configurationSource(corsConfigurationSource()))
         ;
         return http.build();
     }
