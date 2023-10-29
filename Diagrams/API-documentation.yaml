@@ -256,6 +256,26 @@ paths:
       responses:
         "200":
           description: "OK"
+  /polls/{id}/sse:
+    get:
+      summary: "Get live Poll (Server Sent Event)"
+      operationId: "pollSse"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            text/event-stream:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/PollDTO"
   /auth/login:
     post:
       summary: "Login (get auth token)"
