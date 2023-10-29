@@ -1,21 +1,16 @@
 package no.haugalandplus.val;
 
-import no.haugalandplus.val.dto.PollInstDTO;
+import no.haugalandplus.val.constants.PollStatusEnum;
 import no.haugalandplus.val.entities.Choice;
 import no.haugalandplus.val.entities.Poll;
-import no.haugalandplus.val.entities.PollInst;
 import no.haugalandplus.val.entities.User;
-import no.haugalandplus.val.repository.ChoiceRepository;
-import no.haugalandplus.val.repository.PollInstRepository;
 import no.haugalandplus.val.repository.PollRepository;
 import no.haugalandplus.val.repository.UserRepository;
-import no.haugalandplus.val.service.PollInstService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +28,6 @@ public class TestUtils {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private PollRepository pollRepository;
-    @Autowired
-    private PollInstService pollInstService;
-    @Autowired
-    private PollInstRepository pollInstRepository;
 
     private Random random = new Random(42);
     public User saveNewUser() {
@@ -67,10 +58,11 @@ public class TestUtils {
     public Poll saveNewPoll(User u) {
         Poll poll = new Poll();
         poll.setUser(u);
-        poll.setAnon(false);
+        poll.setNeedLogin(false);
         poll.setChoices(new ArrayList<>());
         poll.setName("Is this a good question?");
         poll.setDescription("Lalala");
+        poll.setStatus(PollStatusEnum.NOT_INITIALISED);
         return pollRepository.save(poll);
     }
 
@@ -93,10 +85,5 @@ public class TestUtils {
         assertThat(poll.getChoices(), hasSize(2));
 
         return poll;
-    }
-
-    public PollInst createPollInst(Poll poll) {
-        PollInstDTO pollInstDTO = pollInstService.insertPollInst(poll.getPollId(), new PollInstDTO());
-        return pollInstRepository.findById(pollInstDTO.getPollInstId()).get();
     }
 }

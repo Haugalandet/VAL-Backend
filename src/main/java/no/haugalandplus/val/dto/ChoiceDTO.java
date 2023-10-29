@@ -10,4 +10,5 @@ public class ChoiceDTO {
     private Long ChoiceId;
     private String name;
     private String description;
+    private Long voteCount;
 }

@@ -27,7 +27,7 @@
         }
         @DeleteMapping("/{id}")
         public void deleteUser(@PathVariable Long id) {
-            userservice.removeUser(getUser(id));
+            userservice.removeUser(id);
         }
 
         @PutMapping("/{id}")

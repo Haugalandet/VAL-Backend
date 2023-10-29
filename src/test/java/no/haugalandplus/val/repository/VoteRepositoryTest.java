@@ -24,24 +24,23 @@ class VoteRepositoryTest extends TestUtils {
         User user = saveNewUser();
         Poll poll = saveNewPoll();
         poll = addChoices(poll);
-        PollInst pollInst = createPollInst(poll);
 
         Choice choice1 = poll.getChoices().get(0);
         Choice choice2 = poll.getChoices().get(1);
 
         Vote vote = new Vote();
         vote.setVoteCount(1);
-        vote.setPollInst(pollInst);
+        vote.setPoll(poll);
         vote.setChoice(choice1);
 
         voteRepository.save(vote);
 
-        Long count = voteRepository.sumOfVotesByChoiceIdAndPollInstId(choice1.getChoiceId(), pollInst);
+        Long count = voteRepository.sumOfVotesByChoiceIdAndPollInstId(choice1.getChoiceId(), poll.getPollId());
 
         assertThat(count, notNullValue());
         assertThat(count, is(1L));
 
-        count = voteRepository.sumOfVotesByChoiceIdAndPollInstId(choice2.getChoiceId(), pollInst);
+        count = voteRepository.sumOfVotesByChoiceIdAndPollInstId(choice2.getChoiceId(), poll.getPollId());
 
         assertThat(count, notNullValue());
         assertThat(count, is(0L));

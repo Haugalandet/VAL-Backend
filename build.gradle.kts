@@ -25,7 +25,6 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.xerial:sqlite-jdbc:3.41.2.2")
-	//implementation("com.h2database:h2")
 	implementation("org.hibernate:hibernate-community-dialects:6.3.0.Final")
 	implementation("org.modelmapper:modelmapper:2.1.1")
 	implementation("org.springframework.security:spring-security-core:6.1.4")
@@ -41,6 +40,7 @@ dependencies {
 	runtimeOnly("io.jsonwebtoken:jjwt-orgjson:0.12.2")
 	testImplementation("org.hamcrest:hamcrest:2.1")
 	testImplementation("org.mockito:mockito-core:3.12.4")
+	implementation("org.springframework.boot:spring-boot-starter-webflux:3.1.5")
 }
 
 tasks.withType<Test> {

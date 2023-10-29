@@ -19,4 +19,6 @@ public class Choice {
 
     private String name;
     private String description;
+
+    private long voteCount;
 }
