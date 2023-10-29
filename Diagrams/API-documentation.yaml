@@ -135,12 +135,12 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PollDTO"
-  /polls/{id}:
+  /polls/{poll-id}:
     get:
       summary: "Get poll"
       operationId: "getPoll"
       parameters:
-        - name: "id"
+        - name: "poll-id"
           in: "path"
           required: true
           schema:
@@ -163,7 +163,7 @@ paths:
       summary: "delete poll"
       operationId: "deletePoll"
       parameters:
-        - name: "id"
+        - name: "poll-id"
           in: "path"
           required: true
           schema:
@@ -182,149 +182,12 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PollDTO"
-  /polls/{poll-id}/instances:
-    get:
-      summary: "Get instances of poll"
-      operationId: "getAllPollInsts"
-      parameters:
-        - name: "poll-id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - in: header
-          name: Authorization
-          schema:
-            type: string
-            format: jwt
-          required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/PollInstDTO"
-    post:
-      summary: "Creat poll instance"
-      operationId: "insertPollInst"
-      parameters:
-        - name: "poll-id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - in: header
-          name: Authorization
-          schema:
-            type: string
-            format: jwt
-          required: true
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/PollInstDTORequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PollInstDTO"
-  /polls/{poll-id}/instances/{id}:
-    get:
-      summary: "Get specific poll instance"
-      operationId: "getPollInst"
-      parameters:
-        - name: "poll-id"
-          in: "path"
-          required: false
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PollInstDTO"
-    put:
-      summary: "Cange poll instance (meant for time changes)"
-      operationId: "updatePollInst"
-      parameters:
-        - name: "poll-id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "id"
-          in: "path"
-          required: false
-        - in: header
-          name: Authorization
-          schema:
-            type: string
-            format: jwt
-          required: true
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/PollInstDTOUpdate"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PollInstDTO"
-    delete:
-      summary: "Delete poll instance"
-      operationId: "deletePollInst"
-      parameters:
-        - name: "poll-id"
-          in: "path"
-          required: false
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - in: header
-          name: Authorization
-          schema:
-            type: string
-            format: jwt
-          required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PollInstDTO"
-  /polls/{poll-id}/instances/{pollInstId}/end:
+  /polls/{poll-id}/end:
     post:
       summary: "End poll"
-      operationId: "endPollInst"
+      operationId: "endPoll"
       parameters:
         - name: "poll-id"
-          in: "path"
-          required: false
-        - name: "pollInstId"
           in: "path"
           required: true
           schema:
@@ -342,16 +205,13 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PollInstDTO"
-  /polls/{poll-id}/instances/{pollInstId}/start:
+                $ref: "#/components/schemas/PollDTO"
+  /polls/{poll-id}/start:
     post:
       summary: "Start poll"
-      operationId: "startPollInst"
+      operationId: "startPoll"
       parameters:
         - name: "poll-id"
-          in: "path"
-          required: false
-        - name: "pollInstId"
           in: "path"
           required: true
           schema:
@@ -369,16 +229,13 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PollInstDTO"
-  /polls/{poll-id}/instances/{pollInstId}/votes:
+                $ref: "#/components/schemas/PollDTO"
+  /polls/{poll-id}/votes:
     post:
-      summary: "Vote"
+      summary: "Vote in poll"
       operationId: "vote"
       parameters:
         - name: "poll-id"
-          in: "path"
-          required: false
-        - name: "pollInstId"
           in: "path"
           required: true
           schema:
@@ -399,10 +256,6 @@ paths:
       responses:
         "200":
           description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "boolean"
   /auth/login:
     post:
       summary: "Login (get auth token)"
@@ -492,6 +345,9 @@ components:
           type: "string"
         description:
           type: "string"
+        voteCount:
+          type: "integer"
+          format: "int64"
     ChoiceDTORequest:
       type: "object"
       properties:
@@ -499,68 +355,6 @@ components:
           type: "string"
         description:
           type: "string"
-    PollResultDTO:
-      type: "object"
-      properties:
-        pollChoice:
-          $ref: "#/components/schemas/ChoiceDTO"
-        totalCount:
-          type: "integer"
-          format: "int64"
-    PollInstDTO:
-      type: "object"
-      properties:
-        pollInstId:
-          type: "integer"
-          format: "int64"
-        pollId:
-          type: "integer"
-          format: "int64"
-        name:
-          type: "string"
-        description:
-          type: "string"
-        startTime:
-          type: "string"
-          format: "date-time"
-        endTime:
-          type: "string"
-          format: "date-time"
-        roomCode:
-          type: "string"
-        pollResult:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/PollResultDTO"
-    PollInstDTORequest:
-      type: "object"
-      properties:
-        name:
-          type: "string"
-        description:
-          type: "string"
-        startTime:
-          type: "string"
-          format: "date-time"
-        endTime:
-          type: "string"
-          format: "date-time"
-    PollInstDTOUpdate:
-      type: "object"
-      properties:
-        pollInstId:
-          type: "integer"
-          format: "int64"
-        name:
-          type: "string"
-        description:
-          type: "string"
-        startTime:
-          type: "string"
-          format: "date-time"
-        endTime:
-          type: "string"
-          format: "date-time"
     VoteDTO:
       type: "object"
       properties:
@@ -580,8 +374,14 @@ components:
           type: "string"
         description:
           type: "string"
-        anon:
+        needLogin:
           type: "boolean"
+        status:
+          type: "string"
+          enum:
+            - "NOT_INITIALISED"
+            - "ACTIVE"
+            - "ENDED"
         choices:
           type: "array"
           items:
@@ -593,7 +393,7 @@ components:
           type: "string"
         description:
           type: "string"
-        anon:
+        needLogin:
           type: "boolean"
         choices:
           type: "array"
