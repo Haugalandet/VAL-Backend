@@ -1,5 +1,7 @@
 package no.haugalandplus.val.service;
 
+import no.haugalandplus.val.constants.UserTypeEnum;
+import no.haugalandplus.val.dto.CreateUserDTO;
 import no.haugalandplus.val.dto.UserDTO;
 import no.haugalandplus.val.entities.User;
 import no.haugalandplus.val.repository.UserRepository;
@@ -19,34 +21,30 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public UserDTO insertUser(User user) {
-        User existing = userRepository.getUserByUsername(user.getUsername());
-        if(existing != null) {
-            throw new RuntimeException(user.getUsername()
+    public UserDTO insertUser(CreateUserDTO userDTO) {
+        if(userRepository.existsByUsername(userDTO.getUsername())) {
+            throw new RuntimeException(userDTO.getUsername()
                     + " already exist, please choose something else!");
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User user = new User();
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setUsername(userDTO.getUsername());
+        user.setUserType(UserTypeEnum.USER);
         return convertToDTO(userRepository.save(user));
     }
 
-    public void removeUser(UserDTO user) {
-        long userId = user.getUserId();
-        Boolean existing = userRepository.existsById(userId);
-        if(!existing) {
-            throw new NoSuchElementException("User with ID: "
-                    + userId + " is not found!");
-        }
+    public void removeUser(Long userId) {
         userRepository.deleteById(userId);
     }
 
     public UserDTO updateUser(UserDTO userDTO) {
-        Boolean existing = userRepository.existsById(userDTO.getUserId());
-        if(!existing) {
+        if(userRepository.existsById(userDTO.getUserId())) {
             throw new NoSuchElementException("User with ID: "
                     + userDTO.getUserId() + " is not found!");
         }
         User updatedUser = convertToUser(userDTO);
-        User existingUser = userRepository.findById(userDTO.getUserId()).get();
+        User existingUser = userRepository.findById(userDTO.getUserId())
+                .orElseThrow(NoSuchElementException::new);
 
         updatedUser.setPassword(existingUser.getPassword());
 
@@ -57,7 +55,7 @@ public class UserService {
 
     public UserDTO getUser(long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException());
+                .orElseThrow(NoSuchElementException::new);
         return convertToDTO(user);
     }
 

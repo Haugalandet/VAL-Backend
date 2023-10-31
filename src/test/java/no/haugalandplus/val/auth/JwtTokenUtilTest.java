@@ -10,6 +10,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 
@@ -80,6 +81,7 @@ class JwtTokenUtilTest {
     }
 
     @Test
+    @Transactional
     public void testRevokedToken() {
         String token = jwt.createJWT(user.getUserId());
 

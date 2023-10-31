@@ -1,5 +1,6 @@
     package no.haugalandplus.val.rest;
 
+    import no.haugalandplus.val.dto.CreateUserDTO;
     import no.haugalandplus.val.dto.UserDTO;
     import no.haugalandplus.val.entities.User;
     import no.haugalandplus.val.repository.UserRepository;
@@ -21,12 +22,12 @@
         }
 
         @PostMapping
-        public UserDTO createUser(@RequestBody User user) {
+        public UserDTO createUser(@RequestBody CreateUserDTO user) {
             return userservice.insertUser(user);
         }
         @DeleteMapping("/{id}")
         public void deleteUser(@PathVariable Long id) {
-            userservice.removeUser(getUser(id));
+            userservice.removeUser(id);
         }
 
         @PutMapping("/{id}")

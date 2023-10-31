@@ -8,7 +8,7 @@ import lombok.Setter;
 public class ChoiceDTO {
 
     private Long ChoiceId;
-    private long pollId;
     private String name;
     private String description;
+    private Long voteCount;
 }

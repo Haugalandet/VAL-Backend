@@ -3,29 +3,36 @@ package no.haugalandplus.val.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import no.haugalandplus.val.constants.PollStatusEnum;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
 @Entity
+@Table(indexes = @Index(columnList = "roomCode"))
 public class Poll {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pollId;
 
+    private String name;
+    private String description;
+    private boolean needLogin;
+
+    private Date startTime;
+    private Date endTime;
+
+    private String roomCode;
+
+    private PollStatusEnum status;
+
     @ManyToOne
     private User user;
 
-    @ManyToOne
-    private Config config;
-
-    public Poll(User user, Config config) {
-        this.user = user;
-        this.config = config;
-    }
-
-    public Poll() {}
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "choice_poll_id")
+    private List<Choice> choices;
 }

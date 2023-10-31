@@ -4,9 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity
 @Getter
 @Setter
+@Entity
 public class Choice {
 
     @Id
@@ -14,9 +14,11 @@ public class Choice {
     private Long ChoiceId;
 
     @ManyToOne
+    @JoinColumn(name = "choice_poll_id")
     private Poll poll;
 
     private String name;
     private String description;
 
+    private long voteCount;
 }

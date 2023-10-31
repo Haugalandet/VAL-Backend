@@ -42,10 +42,4 @@ public class AuthController {
         jwrTokenUtil.expire();
         return ResponseEntity.ok("Logout successful");
     }
-
-    @PostMapping("/test")
-    public ResponseEntity<String> test(@RequestBody String s) {
-        StringBuilder sb = new StringBuilder(s);
-        return ResponseEntity.ok(sb.reverse().toString());
-    }
 }

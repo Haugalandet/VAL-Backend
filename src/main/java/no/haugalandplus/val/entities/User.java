@@ -3,12 +3,11 @@ package no.haugalandplus.val.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.HashSet;
-import java.util.Set;
+import no.haugalandplus.val.constants.UserTypeEnum;
 
 @Getter
 @Entity
+@Table(name = "tbl_user")
 public class User {
 
     @Setter
@@ -21,6 +20,9 @@ public class User {
 
     @Setter
     private String password;
+
+    @Setter
+    private UserTypeEnum userType;
 
     public User() {}
 

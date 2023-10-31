@@ -1,22 +1,32 @@
 package no.haugalandplus.val;
 
-import no.haugalandplus.val.dto.PollInstDTO;
-import no.haugalandplus.val.entities.*;
-import no.haugalandplus.val.repository.*;
-import no.haugalandplus.val.service.PollInstService;
+import no.haugalandplus.val.dto.PollDTO;
+import no.haugalandplus.val.repository.PollRepository;
+import no.haugalandplus.val.repository.UserRepository;
+import no.haugalandplus.val.repository.VoteRepository;
+import no.haugalandplus.val.service.UserService;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.PropertyMap;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.core.parameters.P;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import reactor.core.publisher.Sinks;
 
-import java.util.Arrays;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @SpringBootApplication
+@EnableScheduling
 public class ValApplication {
+
+	@Bean
+	public Map<Long, Sinks.Many<PollDTO>> globalSinkMap() {
+		return new ConcurrentHashMap<>();
+	}
+
 
 	@Bean
 	public ModelMapper modelMapper() {
@@ -26,16 +36,25 @@ public class ValApplication {
 
 		return modelMapper;
 	}
-
-	private static ConfigRepository configRepository;
+	@Bean
+	public WebMvcConfigurer corsConfigurer() {
+		return new WebMvcConfigurer() {
+			@Override
+			public void addCorsMappings(CorsRegistry registry) {
+				registry.addMapping("/**").allowedOrigins("*");
+			}
+		};
+	}
 
 	private static PollRepository pollRepository;
 
 	private static UserRepository userRepository;
 
+	private static UserService userService;
+
+
 	private static VoteRepository voteRepository;
 
-	private static PollInstRepository pollInstRepository;
 
 
 	public static void main(String[] args) {
@@ -45,7 +64,7 @@ public class ValApplication {
 
 //		configRepository = context.getBean(ConfigRepository.class);
 //		pollRepository = context.getBean(PollRepository.class);
-//		userRepository = context.getBean(UserRepository.class);
+//		userService = context.getBean(UserService.class);
 //		voteRepository = context.getBean(VoteRepository.class);
 //		pollInstRepository = context.getBean(PollInstRepository.class);
 //
@@ -53,7 +72,9 @@ public class ValApplication {
 //		// Creates test data
 //
 //		User nils = new User("NilsMichael", "Fitjar");
-//		User martin = new User("MartinTunge", "Sterri");
+//		User user = new User("adm", "pas");
+//
+//		userService.insertUser(user);
 //		User helene = new User("HeleneSineNotatarHubert", "Solhaug");
 //		User lasse = new User("LasseLarsMartin", "Taraldset");
 //

@@ -14,7 +14,7 @@ public class Vote {
     private long voteId;
 
     @ManyToOne
-    private PollInst pollInst;
+    private Poll poll;
 
     @ManyToOne
     private User voter;
