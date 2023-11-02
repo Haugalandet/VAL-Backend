@@ -25,16 +25,20 @@ public class AuthController {
     @PostMapping(value = "/login")
     public ResponseEntity<String> login(@RequestBody LoginDTO user) {
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", tokenService.createToken(user));
-        return ResponseEntity.ok().headers(headers).body("Authentication successful");
+        String token = tokenService.createToken(user);
+        headers.add("Authorization", token);
+
+
+        return ResponseEntity.ok().headers(headers).body(token);
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<String> login() {
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", tokenService.createToken());
+        String token = tokenService.createToken();
+        headers.add("Authorization", token);
 
-        return ResponseEntity.ok().headers(headers).body("Authentication successful");
+        return ResponseEntity.ok().headers(headers).body(token);
     }
 
     @PostMapping("/logout")
