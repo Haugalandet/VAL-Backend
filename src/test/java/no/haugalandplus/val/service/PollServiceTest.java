@@ -7,6 +7,7 @@ import no.haugalandplus.val.dto.VoteDTO;
 import no.haugalandplus.val.entities.Choice;
 import no.haugalandplus.val.entities.Poll;
 import no.haugalandplus.val.entities.User;
+import no.haugalandplus.val.entities.Vote;
 import no.haugalandplus.val.repository.ChoiceRepository;
 import no.haugalandplus.val.repository.PollRepository;
 import no.haugalandplus.val.repository.VoteRepository;
@@ -15,7 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -126,7 +128,9 @@ class PollServiceTest extends TestUtils {
 
         pollService.vote(poll.getPollId(), vote);
 
-        assertThat(voteRepository.findAll(), hasSize(1));
+        List<Vote> votes = voteRepository.findAll();
+        assertThat(votes, hasSize(1));
+        assertThat(votes.get(0).getVoteCount(), is(1));
 
         PollDTO pollDTO = pollService.getPoll(poll.getPollId());
         assertThat(pollDTO.getChoices(), hasSize(2));

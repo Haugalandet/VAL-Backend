@@ -1,11 +1,14 @@
 package no.haugalandplus.val.service;
 
 import no.haugalandplus.val.constants.PollStatusEnum;
+import no.haugalandplus.val.constants.UserTypeEnum;
 import no.haugalandplus.val.dto.PollDTO;
 import no.haugalandplus.val.dto.VoteDTO;
 import no.haugalandplus.val.entities.Choice;
 import no.haugalandplus.val.entities.Poll;
+import no.haugalandplus.val.entities.User;
 import no.haugalandplus.val.entities.Vote;
+import no.haugalandplus.val.repository.ChoiceRepository;
 import no.haugalandplus.val.repository.PollRepository;
 import no.haugalandplus.val.repository.VoteRepository;
 import org.modelmapper.ModelMapper;
@@ -22,11 +25,15 @@ public class PollService extends ServiceUtils {
     private final PollRepository pollRepository;
     private final ModelMapper modelMapper;
     private final VoteRepository voteRepository;
+    private final ChoiceRepository choiceRepository;
+    private final IoTService ioTService;
 
-    public PollService(PollRepository pollRepository, ModelMapper modelMapper, VoteRepository voteRepository) {
+    public PollService(PollRepository pollRepository, ModelMapper modelMapper, VoteRepository voteRepository, ChoiceRepository choiceRepository, IoTService ioTService) {
         this.pollRepository = pollRepository;
         this.modelMapper = modelMapper;
         this.voteRepository = voteRepository;
+        this.choiceRepository = choiceRepository;
+        this.ioTService = ioTService;
     }
 
     private PollDTO convert(Poll poll) {
@@ -75,9 +82,15 @@ public class PollService extends ServiceUtils {
     }
 
     public void vote(Long pollId, VoteDTO voteDTO) {
-        Vote vote = modelMapper.map(voteDTO, Vote.class);
-        //vote.setVoteId(0);
+        Vote vote = new Vote();
+        vote.setVoteCount(1);
+        vote.setChoice(choiceRepository.findById(voteDTO.getChoiceId()).get());
+
         Poll poll = pollRepository.findById(pollId).get();
+
+//        if (vote.getChoice() poll.getChoices()) {
+//            throw new RuntimeException("Choice does not belong to poll");
+//        }
         if (poll.getStatus() != PollStatusEnum.ACTIVE) {
             throw new AccessDeniedException("Poll is not active. Has status " + poll.getStatus().toString());
         }
@@ -88,10 +101,13 @@ public class PollService extends ServiceUtils {
             vote.setVoter(getCurrentUser());
         }
         vote.setPoll(poll);
-        vote.setVoteCount(1);
-//        if (vote.getVoteCount() == null || vote.getVoteCount() == 0) {
-//            vote.setVoteCount(1);
-//        }
+        if (voteDTO.getVoteCount() != null && voteDTO.getVoteCount() > 1) {
+            User iot = getCurrentUser();
+            if (iot.getUserType() != UserTypeEnum.IOT) {
+                throw new RuntimeException("Only IoT devices can send more then one vote");
+            }
+            vote.setVoteCount(voteDTO.getVoteCount().intValue());
+        }
         voteRepository.save(vote);
     }
 
@@ -112,6 +128,7 @@ public class PollService extends ServiceUtils {
         }
         poll.setEndTime(new Date());
         poll.setStatus(PollStatusEnum.ENDED);
+        ioTService.removeIot(poll.getIotList());
         return convert(pollRepository.save(poll));
     }
 

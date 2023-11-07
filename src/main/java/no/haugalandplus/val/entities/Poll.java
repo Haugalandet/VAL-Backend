@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import no.haugalandplus.val.constants.PollStatusEnum;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -35,4 +36,7 @@ public class Poll {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "choice_poll_id")
     private List<Choice> choices;
+
+    @OneToMany
+    private List<User> iotList = new ArrayList<>();
 }
