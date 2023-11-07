@@ -88,9 +88,6 @@ public class PollService extends ServiceUtils {
 
         Poll poll = pollRepository.findById(pollId).get();
 
-//        if (vote.getChoice() poll.getChoices()) {
-//            throw new RuntimeException("Choice does not belong to poll");
-//        }
         if (poll.getStatus() != PollStatusEnum.ACTIVE) {
             throw new AccessDeniedException("Poll is not active. Has status " + poll.getStatus().toString());
         }
