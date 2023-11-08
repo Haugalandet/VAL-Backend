@@ -1,34 +1,25 @@
 package no.haugalandplus.val.config;
 
 import no.haugalandplus.val.auth.JwtTokenAuthenticationFilter;
-import no.haugalandplus.val.auth.JwtTokenUtil;
-import no.haugalandplus.val.repository.UserRepository;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.Arrays;
 
 @Configuration
 public class SecurityConfig {
 
-    private UserRepository userRepository;
-    private JwtTokenUtil jwtTokenUtil;
+    private final JwtTokenAuthenticationFilter jwtTokenAuthenticationFilter;
 
-    public SecurityConfig(UserRepository userRepository, JwtTokenUtil jwtTokenUtil) {
-        this.userRepository = userRepository;
-        this.jwtTokenUtil = jwtTokenUtil;
+    public SecurityConfig(JwtTokenAuthenticationFilter jwtTokenAuthenticationFilter) {
+        this.jwtTokenAuthenticationFilter = jwtTokenAuthenticationFilter;
     }
 
     @Bean
@@ -41,20 +32,18 @@ public class SecurityConfig {
         return configuration.getAuthenticationManager();
     }
 
+    @Bean
+    public FilterRegistrationBean<JwtTokenAuthenticationFilter> myCustomFilterRegistrationBean() {
+        FilterRegistrationBean<JwtTokenAuthenticationFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(jwtTokenAuthenticationFilter);
+        registrationBean.addUrlPatterns("/*");
+        registrationBean.setOrder(1);
+        return registrationBean;
+    }
 
     @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests((authz) -> authz
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/users").permitAll()
-                        .requestMatchers("/polls/*/sse").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .addFilterBefore(new JwtTokenAuthenticationFilter(userRepository, jwtTokenUtil), UsernamePasswordAuthenticationFilter.class)
-                .csrf((csrf) -> csrf.disable())
-                //.cors((cors) -> cors.configurationSource(corsConfigurationSource()))
-        ;
+        http.csrf(AbstractHttpConfigurer::disable);
         return http.build();
     }
 }

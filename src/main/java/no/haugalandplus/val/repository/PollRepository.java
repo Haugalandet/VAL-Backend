@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface PollRepository extends JpaRepository<Poll, Long> {
     List<Poll> findAllByUser(User user);
+
+    boolean existsByPollIdAndUser(Long pollId, User user);
 }
