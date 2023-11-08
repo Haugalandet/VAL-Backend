@@ -17,7 +17,7 @@ public class Choice {
     @JoinColumn(name = "choice_poll_id")
     private Poll poll;
 
-    private String name;
+    private String title;
     private String description;
 
     private long voteCount;

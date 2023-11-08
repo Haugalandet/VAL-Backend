@@ -50,7 +50,22 @@ public class PollService extends ServiceUtils {
 
 
     public PollDTO getPoll(Long id) {
-        return convert(pollRepository.findById(id).get());
+        Poll poll = pollRepository.findById(id).get();
+        if (poll.getStatus() == PollStatusEnum.NOT_INITIALISED) {
+            if (poll.getStartTime() != null && poll.getStartTime().before(new Date())) {
+                poll.setStatus(PollStatusEnum.ACTIVE);
+                poll = pollRepository.save(poll);
+            } else {
+                throw new RuntimeException("Poll is not opend");
+            }
+        }
+        if (poll.getStatus() == PollStatusEnum.ACTIVE
+                && poll.getEndTime() != null
+                && poll.getEndTime().before(new Date())) {
+            poll.setStatus(PollStatusEnum.ENDED);
+            poll = pollRepository.save(poll);
+        }
+        return convert(poll);
     }
 
     public PollDTO updatePollResult(Long id) {

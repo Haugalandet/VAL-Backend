@@ -4,16 +4,18 @@ import lombok.Getter;
 import lombok.Setter;
 import no.haugalandplus.val.constants.PollStatusEnum;
 
+import java.util.Date;
 import java.util.List;
 
 @Getter
 @Setter
 public class PollDTO {
     private long pollId;
-    //private long userId;
-    private String name;
+    private String title;
     private String description;
     private boolean anon;
+    private Date startTime;
+    private Date endTime;
     private PollStatusEnum status;
     private List<ChoiceDTO> choices;
 }
