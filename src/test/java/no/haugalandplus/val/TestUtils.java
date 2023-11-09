@@ -6,6 +6,7 @@ import no.haugalandplus.val.entities.Poll;
 import no.haugalandplus.val.entities.User;
 import no.haugalandplus.val.repository.PollRepository;
 import no.haugalandplus.val.repository.UserRepository;
+import no.haugalandplus.val.service.RoomCodeHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -62,21 +63,23 @@ public class TestUtils {
         poll.setUser(u);
         poll.setNeedLogin(false);
         poll.setChoices(new ArrayList<>());
-        poll.setName("Is this a good question?");
+        poll.setTitle("Is this a good question?");
         poll.setDescription("Lalala");
         poll.setStatus(PollStatusEnum.NOT_INITIALISED);
+        poll = pollRepository.save(poll);
+        poll.setRoomCode(RoomCodeHelper.generateRoomCode(poll.getPollId()));
         return pollRepository.save(poll);
     }
 
     public Poll addChoices(Poll poll) {
         List<Choice> choiceList = new ArrayList<>();
         Choice choice1 = new Choice();
-        choice1.setName("Yes");
+        choice1.setTitle("Yes");
         choice1.setDescription("No");
         choiceList.add(choice1);
 
         Choice choice2 = new Choice();
-        choice2.setName("No");
+        choice2.setTitle("No");
         choice2.setDescription("Yes");
         choiceList.add(choice2);
 
