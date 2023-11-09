@@ -1,6 +1,7 @@
 package no.haugalandplus.val.service;
 
 import no.haugalandplus.val.TestUtils;
+import no.haugalandplus.val.constants.PollStatusEnum;
 import no.haugalandplus.val.dto.ChoiceDTO;
 import no.haugalandplus.val.dto.PollDTO;
 import no.haugalandplus.val.dto.VoteDTO;
@@ -17,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -44,18 +46,18 @@ class PollServiceTest extends TestUtils {
         User user = saveNewUser();
         setSecurityContextUser(user);
         PollDTO pollDTO = new PollDTO();
-        pollDTO.setName("Noting?");
+        pollDTO.setTitle("Noting?");
         pollDTO.setDescription("Wow, very cool question");
 
         List<ChoiceDTO> choices = new ArrayList<>();
 
         ChoiceDTO choiceDTO = new ChoiceDTO();
-        choiceDTO.setName("yes");
+        choiceDTO.setTitle("yes");
         choiceDTO.setDescription("No");
         choices.add(choiceDTO);
 
         choiceDTO = new ChoiceDTO();
-        choiceDTO.setName("no");
+        choiceDTO.setTitle("no");
         choiceDTO.setDescription("yes");
         choices.add(choiceDTO);
 
@@ -65,18 +67,18 @@ class PollServiceTest extends TestUtils {
         assertThat(poll.getChoices(), hasSize(2));
 
         pollDTO = new PollDTO();
-        pollDTO.setName("This is a super good test?");
+        pollDTO.setTitle("This is a super good test?");
         pollDTO.setDescription("NOthing is wrong?");
 
         choices = new ArrayList<>();
 
         choiceDTO = new ChoiceDTO();
-        choiceDTO.setName("Sure");
+        choiceDTO.setTitle("Sure");
         choiceDTO.setDescription("No");
         choices.add(choiceDTO);
 
         choiceDTO = new ChoiceDTO();
-        choiceDTO.setName("Okay");
+        choiceDTO.setTitle("Okay");
         choiceDTO.setDescription(":)");
         choices.add(choiceDTO);
 
@@ -86,10 +88,19 @@ class PollServiceTest extends TestUtils {
 
         assertThat(pollService.getAllPolls(), hasSize(2));
 
+        try {
+            assertThat(pollService.getPoll(poll.getPollId()), notNullValue());
+            fail("The poll is not active, and should not return");
+        } catch (Exception e) {
+            // Ayyyy
+        }
+
+        pollService.start(poll.getPollId());
+
         assertThat(pollService.getPoll(poll.getPollId()), notNullValue());
         assertThat(pollService.getPoll(poll.getPollId()).getChoices(), hasSize(2));
         ChoiceDTO c1 = pollService.getPoll(poll.getPollId()).getChoices().get(0);
-        assertThat(c1.getName(), is("Sure"));
+        assertThat(c1.getTitle(), is("Sure"));
 
     }
 
@@ -98,6 +109,8 @@ class PollServiceTest extends TestUtils {
     public void createPoll() {
         Poll poll = saveNewPoll();
         poll = addChoices(poll);
+
+        pollService.start(poll.getPollId());
 
         PollDTO pollDTO = pollService.getPoll(poll.getPollId());
 
@@ -218,5 +231,59 @@ class PollServiceTest extends TestUtils {
         } catch (Exception e) {
             assertThat(e, instanceOf(Exception.class));
         }
+    }
+
+    @Test
+    @Transactional
+    public void timedPollTest() {
+        Poll poll = saveNewPoll();
+        poll = addChoices(poll);
+
+        try {
+            PollDTO pollDTO = pollService.getPoll(poll.getPollId());
+            fail("poll is not stated. Should not return");
+        } catch (Exception e) {
+            // Eyyy
+        }
+
+        poll.setStartTime(new Date(16440544000000L));
+        poll = pollRepository.save(poll);
+
+        try {
+            PollDTO pollDTO = pollService.getPoll(poll.getPollId());
+            fail("poll is not stated. Should not return");
+        } catch (Exception e) {
+            // Eyyy
+        }
+
+        poll.setStartTime(new Date(1644054400000L));
+        poll = pollRepository.save(poll);
+
+
+        PollDTO pollDTO = pollService.getPoll(poll.getPollId());
+        assertThat(pollDTO.getStatus(), is(PollStatusEnum.ACTIVE));
+
+        poll.setEndTime(new Date(16440544000000L));
+        poll = pollRepository.save(poll);
+
+        pollDTO = pollService.getPoll(poll.getPollId());
+        assertThat(pollDTO.getStatus(), is(PollStatusEnum.ACTIVE));
+
+        poll.setEndTime(new Date(1644054400000L));
+        poll = pollRepository.save(poll);
+
+        pollDTO = pollService.getPoll(poll.getPollId());
+        assertThat(pollDTO.getStatus(), is(PollStatusEnum.ENDED));
+    }
+
+    @Test
+    @Transactional
+    public void roomCode() {
+        Poll poll = saveNewPoll();
+        assertThat(poll.getRoomCode(), notNullValue());
+
+        PollDTO pollDTO = pollService.getPollWithRoomCode(poll.getRoomCode());
+
+        assertThat(pollDTO.getPollId(), is(poll.getPollId()));
     }
 }

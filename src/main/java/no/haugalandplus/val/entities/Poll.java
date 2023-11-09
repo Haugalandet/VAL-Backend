@@ -19,7 +19,7 @@ public class Poll {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pollId;
 
-    private String name;
+    private String title;
     private String description;
     private boolean needLogin;
 

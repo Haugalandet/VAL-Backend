@@ -50,7 +50,31 @@ public class PollService extends ServiceUtils {
 
 
     public PollDTO getPoll(Long id) {
-        return convert(pollRepository.findById(id).get());
+        Poll poll = pollRepository.findById(id).get();
+        return processPoll(poll);
+    }
+
+    public PollDTO getPollWithRoomCode(String roomCode) {
+        Poll poll = pollRepository.findByRoomCode(roomCode);
+        return processPoll(poll);
+    }
+
+    private PollDTO processPoll(Poll poll) {
+        if (poll.getStatus() == PollStatusEnum.NOT_INITIALISED) {
+            if (poll.getStartTime() != null && poll.getStartTime().before(new Date())) {
+                poll.setStatus(PollStatusEnum.ACTIVE);
+                poll = pollRepository.save(poll);
+            } else {
+                throw new RuntimeException("Poll is not opend");
+            }
+        }
+        if (poll.getStatus() == PollStatusEnum.ACTIVE
+                && poll.getEndTime() != null
+                && poll.getEndTime().before(new Date())) {
+            poll.setStatus(PollStatusEnum.ENDED);
+            poll = pollRepository.save(poll);
+        }
+        return convert(poll);
     }
 
     public PollDTO updatePollResult(Long id) {
@@ -66,7 +90,7 @@ public class PollService extends ServiceUtils {
         poll.setUser(getCurrentUser());
         poll.setStatus(PollStatusEnum.NOT_INITIALISED);
         poll = pollRepository.save(poll);
-        poll.setRoomCode(generateRoomCode(poll.getPollId()));
+        poll.setRoomCode(RoomCodeHelper.generateRoomCode(poll.getPollId()));
         return convert(pollRepository.save(poll));
     }
 
@@ -108,26 +132,5 @@ public class PollService extends ServiceUtils {
         poll.setStatus(PollStatusEnum.ENDED);
         ioTService.removeIot(poll);
         return convert(pollRepository.save(poll));
-    }
-
-    /**
-     * Algorithm that generates unique room codes for
-     * every id.
-     * @param id poll Id
-     * @return roomCode
-     */
-    private String generateRoomCode(Long id) {
-        BigInteger largePrime = BigInteger.valueOf(1207571);
-        long xorMask = 56876;
-        long pow = 6;
-        if (id*2 >= Math.pow(10, pow)) {
-            while (Math.pow(10, pow) <= id*2) {
-                pow += 1;
-            }
-        }
-        long code = id;
-        code = code ^ xorMask;
-        code = BigInteger.valueOf(code).multiply(largePrime).mod(BigInteger.valueOf((long) Math.pow(10, pow))).longValue();
-        return String.format("%0"+pow+"d", code);
     }
 }

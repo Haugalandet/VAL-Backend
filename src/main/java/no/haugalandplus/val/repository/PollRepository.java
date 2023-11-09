@@ -12,4 +12,5 @@ public interface PollRepository extends JpaRepository<Poll, Long> {
     boolean existsByPollIdAndUser(Long pollId, User user);
     boolean existsByPollIdAndIotListContainingAndStatus(Long pollId, User user, PollStatusEnum status);
     boolean existsByPollIdAndStatus(Long pollId, PollStatusEnum status);
+    Poll findByRoomCode(String roomCode);
 }
