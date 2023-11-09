@@ -61,4 +61,8 @@ public class AuthService extends ServiceUtils {
             return false;
         }
     }
+
+    public Boolean iotCanConnect(Long pollId) {
+        return pollRepository.existsByPollIdAndStatus(pollId, PollStatusEnum.NOT_INITIALISED);
+    }
 }

@@ -20,6 +20,7 @@ public class IoTController {
     }
 
     @PostMapping("polls/{poll-id}")
+    @PreAuthorize("@authService.iotCanConnect(#id)")
     public ResponseEntity<String> connectToPoll(@PathVariable("poll-id") Long id) {
         String token = iotService.addIotToPoll(id);
 

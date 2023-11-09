@@ -132,4 +132,19 @@ class AuthServiceTest extends TestUtils {
         setSecurityContextUser(saveNewUser());
         assertThat(authService.canVote(poll.getChoices().get(0).getChoiceId()), is(true));
     }
+
+    @Test
+    @Transactional
+    public void iotCanConnect() {
+        assertThat(authService.iotCanConnect(1337L), is(false));
+
+        Poll poll = saveNewPoll();
+        assertThat(authService.iotCanConnect(poll.getPollId()), is(true));
+
+        startPoll(poll);
+        assertThat(authService.iotCanConnect(poll.getPollId()), is(false));
+
+        assertThat(authService.iotCanConnect(saveNewPoll().getPollId()), is(true));
+
+    }
 }
