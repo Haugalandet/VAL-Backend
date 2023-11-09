@@ -49,6 +49,7 @@ public class PollController {
     }
 
     @PostMapping("/{id}/votes")
+    @PreAuthorize("@authService.canVote(#vote.choiceId)")
     public void vote(@PathVariable Long id, @RequestBody VoteDTO vote) {
         liveService.vote(id, vote);
     }

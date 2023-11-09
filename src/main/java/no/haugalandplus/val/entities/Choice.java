@@ -3,6 +3,7 @@ package no.haugalandplus.val.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.engine.internal.Cascade;
 
 @Getter
 @Setter
@@ -14,7 +15,6 @@ public class Choice {
     private Long ChoiceId;
 
     @ManyToOne
-    @JoinColumn(name = "choice_poll_id")
     private Poll poll;
 
     private String name;

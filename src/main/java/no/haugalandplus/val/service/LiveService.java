@@ -3,7 +3,6 @@ package no.haugalandplus.val.service;
 import lombok.Getter;
 import no.haugalandplus.val.dto.PollDTO;
 import no.haugalandplus.val.dto.VoteDTO;
-import no.haugalandplus.val.entities.Poll;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;

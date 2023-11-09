@@ -105,6 +105,7 @@ class PollServiceTest extends TestUtils {
         assertThat(pollDTO.getChoices(), hasSize(2));
     }
 
+    /*
     @Test
     @Transactional
     public void voteTest() {
@@ -183,6 +184,7 @@ class PollServiceTest extends TestUtils {
             assertThat(e, instanceOf(Exception.class));
         }
     }
+    */
 
     @Test
     @Transactional

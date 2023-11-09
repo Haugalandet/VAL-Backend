@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -93,7 +95,7 @@ class IoTServiceTest extends TestUtils {
         vote.setChoiceId(poll.getChoices().get(0).getChoiceId());
         vote.setVoteCount(100L);
 
-        pollService.vote(poll.getPollId(), vote);
+        ioTService.vote(poll.getPollId(), List.of(vote));
 
         List<Vote> votes = voteRepository.findAll();
         assertThat(votes, hasSize(1));
@@ -115,7 +117,7 @@ class IoTServiceTest extends TestUtils {
         Claims claims = jwtTokenUtil.isExpired(token);
         User iot = userRepository.findById(Long.parseLong(claims.getSubject())).get();
 
-        ioTService.removeIot(userRepository.findAll());
+        ioTService.removeIot(pollRepository.findById(poll.getPollId()).get());
 
         assertThat(userRepository.count(), is(nrUsers));
         assertThat(userRepository.existsByUsername(iot.getUsername()), is(false));

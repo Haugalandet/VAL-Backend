@@ -73,18 +73,18 @@ public class TestUtils {
         Choice choice1 = new Choice();
         choice1.setName("Yes");
         choice1.setDescription("No");
-        choiceList.add(choice1);
+        poll.addChoice(choice1);
 
         Choice choice2 = new Choice();
         choice2.setName("No");
         choice2.setDescription("Yes");
-        choiceList.add(choice2);
-
-        poll.setChoices(choiceList);
+        poll.addChoice(choice2);
 
         poll = pollRepository.save(poll);
         assertThat(poll, notNullValue());
         assertThat(poll.getChoices(), hasSize(2));
+
+        assertThat(poll.getChoices().get(0).getPoll(), notNullValue());
 
         return poll;
     }
