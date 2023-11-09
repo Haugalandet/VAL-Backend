@@ -85,6 +85,7 @@ public class PollService extends ServiceUtils {
         Vote vote = new Vote();
         vote.setVoteCount(1);
         vote.setChoice(choiceRepository.findById(voteDTO.getChoiceId()).get());
+        vote.setVoter(getCurrentUserSafe());
         voteRepository.save(vote);
     }
 

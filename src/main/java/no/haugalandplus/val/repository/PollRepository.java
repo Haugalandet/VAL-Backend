@@ -9,8 +9,7 @@ import java.util.List;
 
 public interface PollRepository extends JpaRepository<Poll, Long> {
     List<Poll> findAllByUser(User user);
-
     boolean existsByPollIdAndUser(Long pollId, User user);
+    boolean existsByPollIdAndIotListContainingAndStatus(Long pollId, User user, PollStatusEnum status);
 
-    //boolean existsByPollIdAndStatusAndAndIotListContains(Long pollId, User iot, PollStatusEnum status);
 }

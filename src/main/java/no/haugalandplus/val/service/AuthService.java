@@ -42,8 +42,8 @@ public class AuthService extends ServiceUtils {
     }
 
     public Boolean iotCanVote(Long pollId) {
-        return isLoggedIn();
-                //&& pollRepository.existsByPollIdAndIotListContainingAndStatus(pollId, getCurrentUser(), PollStatusEnum.ACTIVE);
+        return isLoggedIn()
+                && pollRepository.existsByPollIdAndIotListContainingAndStatus(pollId, getCurrentUser(), PollStatusEnum.ACTIVE);
     }
 
     public Boolean canVote(Long choiceId) {

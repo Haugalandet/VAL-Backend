@@ -6,6 +6,7 @@ import no.haugalandplus.val.entities.Poll;
 import no.haugalandplus.val.entities.User;
 import no.haugalandplus.val.repository.PollRepository;
 import no.haugalandplus.val.repository.UserRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,7 +32,13 @@ public class TestUtils {
     @Autowired
     private PollRepository pollRepository;
 
-    private Random random = new Random(42);
+    private final Random random = new Random(42);
+
+    @AfterEach
+    public void clear() {
+        SecurityContextHolder.clearContext();
+    }
+
     public User saveNewUser() {
         User user = new User();
         user.setUsername("Guro Victoria" + random.nextInt());
