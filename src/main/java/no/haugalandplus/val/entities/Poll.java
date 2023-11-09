@@ -33,10 +33,14 @@ public class Poll {
     @ManyToOne
     private User user;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "choice_poll_id")
-    private List<Choice> choices;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "poll")
+    private List<Choice> choices = new ArrayList<>();
 
     @OneToMany
     private List<User> iotList = new ArrayList<>();
+
+    public void addChoice(Choice choice) {
+        choices.add(choice);
+        choice.setPoll(this);
+    }
 }

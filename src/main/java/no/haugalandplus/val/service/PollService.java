@@ -1,12 +1,10 @@
 package no.haugalandplus.val.service;
 
 import no.haugalandplus.val.constants.PollStatusEnum;
-import no.haugalandplus.val.constants.UserTypeEnum;
 import no.haugalandplus.val.dto.PollDTO;
 import no.haugalandplus.val.dto.VoteDTO;
 import no.haugalandplus.val.entities.Choice;
 import no.haugalandplus.val.entities.Poll;
-import no.haugalandplus.val.entities.User;
 import no.haugalandplus.val.entities.Vote;
 import no.haugalandplus.val.repository.ChoiceRepository;
 import no.haugalandplus.val.repository.PollRepository;
@@ -41,7 +39,9 @@ public class PollService extends ServiceUtils {
     }
 
     private Poll convert(PollDTO pollDTO) {
-        return modelMapper.map(pollDTO, Poll.class);
+        Poll poll = modelMapper.map(pollDTO, Poll.class);
+        poll.getChoices().forEach(c -> c.setPoll(poll));
+        return poll;
     }
 
     public List<PollDTO> getAllPolls() {
@@ -80,7 +80,7 @@ public class PollService extends ServiceUtils {
     public PollDTO updatePollResult(Long id) {
         Poll poll = pollRepository.findById(id).get();
         for (Choice c : poll.getChoices()) {
-            c.setVoteCount(voteRepository.sumOfVotesByChoiceIdAndPollInstId(c.getChoiceId(), id));
+            c.setVoteCount(voteRepository.sumOfVotesByChoiceId(c.getChoiceId()));
         }
         return convert(pollRepository.save(poll));
     }
@@ -109,26 +109,7 @@ public class PollService extends ServiceUtils {
         Vote vote = new Vote();
         vote.setVoteCount(1);
         vote.setChoice(choiceRepository.findById(voteDTO.getChoiceId()).get());
-
-        Poll poll = pollRepository.findById(pollId).get();
-
-        if (poll.getStatus() != PollStatusEnum.ACTIVE) {
-            throw new AccessDeniedException("Poll is not active. Has status " + poll.getStatus().toString());
-        }
-        if (poll.isNeedLogin()) {
-            if (voteRepository.existsByVoterAndPoll(getCurrentUser(), poll)) {
-                throw new AccessDeniedException("User has already voted");
-            }
-            vote.setVoter(getCurrentUser());
-        }
-        vote.setPoll(poll);
-        if (voteDTO.getVoteCount() != null && voteDTO.getVoteCount() > 1) {
-            User iot = getCurrentUser();
-            if (iot.getUserType() != UserTypeEnum.IOT) {
-                throw new RuntimeException("Only IoT devices can send more then one vote");
-            }
-            vote.setVoteCount(voteDTO.getVoteCount().intValue());
-        }
+        vote.setVoter(getCurrentUserSafe());
         voteRepository.save(vote);
     }
 
@@ -149,7 +130,7 @@ public class PollService extends ServiceUtils {
         }
         poll.setEndTime(new Date());
         poll.setStatus(PollStatusEnum.ENDED);
-        ioTService.removeIot(poll.getIotList());
+        ioTService.removeIot(poll);
         return convert(pollRepository.save(poll));
     }
 }

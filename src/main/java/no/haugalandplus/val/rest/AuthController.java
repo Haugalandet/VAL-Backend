@@ -5,6 +5,7 @@ import no.haugalandplus.val.auth.JwtTokenUtil;
 import no.haugalandplus.val.dto.LoginDTO;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 public class AuthController {
 
-    private TokenService tokenService;
-    private JwtTokenUtil jwrTokenUtil;
+    private final TokenService tokenService;
+    private final JwtTokenUtil jwrTokenUtil;
 
     public AuthController(TokenService tokenService, JwtTokenUtil jwrTokenUtil) {
         this.tokenService = tokenService;
@@ -30,6 +31,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
+    @PreAuthorize("@authService.isLoggedIn()")
     public ResponseEntity<String> login() {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", tokenService.createToken());
@@ -38,6 +40,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
+    @PreAuthorize("@authService.isLoggedIn()")
     public ResponseEntity<String> signOut() {
         jwrTokenUtil.expire();
         return ResponseEntity.ok("Logout successful");

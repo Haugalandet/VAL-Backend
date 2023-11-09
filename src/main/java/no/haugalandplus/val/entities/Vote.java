@@ -14,9 +14,6 @@ public class Vote {
     private long voteId;
 
     @ManyToOne
-    private Poll poll;
-
-    @ManyToOne
     private User voter;
 
     @ManyToOne

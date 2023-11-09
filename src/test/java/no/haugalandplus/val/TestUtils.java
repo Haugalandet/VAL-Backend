@@ -6,6 +6,7 @@ import no.haugalandplus.val.entities.Poll;
 import no.haugalandplus.val.entities.User;
 import no.haugalandplus.val.repository.PollRepository;
 import no.haugalandplus.val.repository.UserRepository;
+import org.junit.jupiter.api.AfterEach;
 import no.haugalandplus.val.service.RoomCodeHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,7 +33,13 @@ public class TestUtils {
     @Autowired
     private PollRepository pollRepository;
 
-    private Random random = new Random(42);
+    private final Random random = new Random(42);
+
+    @AfterEach
+    public void clear() {
+        SecurityContextHolder.clearContext();
+    }
+
     public User saveNewUser() {
         User user = new User();
         user.setUsername("Guro Victoria" + random.nextInt());
@@ -76,18 +83,18 @@ public class TestUtils {
         Choice choice1 = new Choice();
         choice1.setTitle("Yes");
         choice1.setDescription("No");
-        choiceList.add(choice1);
+        poll.addChoice(choice1);
 
         Choice choice2 = new Choice();
         choice2.setTitle("No");
         choice2.setDescription("Yes");
-        choiceList.add(choice2);
-
-        poll.setChoices(choiceList);
+        poll.addChoice(choice2);
 
         poll = pollRepository.save(poll);
         assertThat(poll, notNullValue());
         assertThat(poll.getChoices(), hasSize(2));
+
+        assertThat(poll.getChoices().get(0).getPoll(), notNullValue());
 
         return poll;
     }

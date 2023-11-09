@@ -42,6 +42,7 @@ class JwtTokenUtilTest {
     }
 
     @Test
+    @Transactional
     public void testValidation() {
         String token = jwt.createJWT(user.getUserId());
 
@@ -51,6 +52,7 @@ class JwtTokenUtilTest {
     }
 
     @Test
+    @Transactional
     public void testExpired() {
         // Change the time expireTime, so that the token is already expired.
         ReflectionTestUtils.setField(jwt, "expireTime", -1000L);
@@ -66,6 +68,7 @@ class JwtTokenUtilTest {
     }
 
     @Test
+    @Transactional
     public void testNonValidToken() {
         JwtTokenUtil jwt = new JwtTokenUtil(tokenRevocationRepository);
 
