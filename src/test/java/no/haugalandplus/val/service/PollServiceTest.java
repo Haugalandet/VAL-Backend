@@ -282,6 +282,15 @@ class PollServiceTest extends TestUtils {
         Poll poll = saveNewPoll();
         assertThat(poll.getRoomCode(), notNullValue());
 
+        try {
+            PollDTO pollDTO = pollService.getPollWithRoomCode(poll.getRoomCode());
+            fail();
+        } catch (Exception e) {
+            // YaYa
+        }
+
+        startPoll(poll);
+
         PollDTO pollDTO = pollService.getPollWithRoomCode(poll.getRoomCode());
 
         assertThat(pollDTO.getPollId(), is(poll.getPollId()));

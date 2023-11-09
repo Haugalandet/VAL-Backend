@@ -36,8 +36,8 @@ public class IoTService extends ServiceUtils {
         this.voteRepository = voteRepository;
     }
 
-    public String addIotToPoll(Long pollId) {
-        Poll poll = pollRepository.findById(pollId).get();
+    public String addIotToPoll(String pollId) {
+        Poll poll = pollRepository.findByRoomCode(pollId);
         if (poll.getStatus() != PollStatusEnum.NOT_INITIALISED) {
             throw new RuntimeException("Can not add IoT-device to initiated polls");
         }

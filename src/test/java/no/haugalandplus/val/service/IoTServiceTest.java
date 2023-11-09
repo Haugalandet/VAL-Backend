@@ -52,7 +52,7 @@ class IoTServiceTest extends TestUtils {
         Poll poll = saveNewPoll();
         poll = addChoices(poll);
 
-        String token = ioTService.addIotToPoll(poll.getPollId());
+        String token = ioTService.addIotToPoll(poll.getRoomCode());
 
         Claims claims = jwtTokenUtil.isExpired(token);
 
@@ -68,7 +68,7 @@ class IoTServiceTest extends TestUtils {
         startPoll(poll);
 
         try {
-            ioTService.addIotToPoll(poll.getPollId());
+            ioTService.addIotToPoll(poll.getRoomCode());
             fail();
         } catch (Exception e) {
             assertThat(e, instanceOf(Exception.class));
@@ -81,7 +81,7 @@ class IoTServiceTest extends TestUtils {
         Poll poll = saveNewPoll();
         poll = addChoices(poll);
 
-        String token = ioTService.addIotToPoll(poll.getPollId());
+        String token = ioTService.addIotToPoll(poll.getRoomCode());
 
         Claims claims = jwtTokenUtil.isExpired(token);
 
@@ -110,7 +110,7 @@ class IoTServiceTest extends TestUtils {
 
         Long nrUsers = userRepository.count();
 
-        String token = ioTService.addIotToPoll(poll.getPollId());
+        String token = ioTService.addIotToPoll(poll.getRoomCode());
 
         assertThat(userRepository.count(), is(nrUsers+1));
 

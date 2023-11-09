@@ -1,9 +1,9 @@
 package no.haugalandplus.val.rest;
 
+import no.haugalandplus.val.dto.PollDTO;
 import no.haugalandplus.val.dto.VoteDTO;
 import no.haugalandplus.val.service.IoTService;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
+import no.haugalandplus.val.service.PollService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,18 +15,18 @@ public class IoTController {
 
     private final IoTService iotService;
 
-    public IoTController(IoTService iotService) {
+    private final PollService pollService;
+
+    public IoTController(IoTService iotService, PollService pollService) {
         this.iotService = iotService;
+        this.pollService = pollService;
     }
 
     @PostMapping("polls/{poll-id}")
-    @PreAuthorize("@authService.iotCanConnect(#id)")
-    public ResponseEntity<String> connectToPoll(@PathVariable("poll-id") Long id) {
-        String token = iotService.addIotToPoll(id);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", token);
-        return ResponseEntity.ok().headers(headers).body(token);
+    @PreAuthorize("@authService.iotCanConnect(#roomCode)")
+    public PollDTO connectToPoll(@PathVariable("poll-id") String roomCode) {
+        String token = iotService.addIotToPoll(roomCode);
+        return pollService.getPollWithRoomCode(roomCode);
     }
 
     @PostMapping("polls/{poll-id}/votes")

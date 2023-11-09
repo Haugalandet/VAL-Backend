@@ -84,7 +84,7 @@ class AuthServiceTest extends TestUtils {
     void iotCanVote() {
         Poll poll = saveNewPoll();
 
-        String token = iotService.addIotToPoll(poll.getPollId());
+        String token = iotService.addIotToPoll(poll.getRoomCode());
         Claims claims = jwtTokenUtil.isExpired(token);
         User user = userRepository.findById(Long.parseLong(claims.getSubject())).get();
         setSecurityContextUser(user);
@@ -94,7 +94,7 @@ class AuthServiceTest extends TestUtils {
         startPoll(poll);
         assertThat(authService.iotCanVote(poll.getPollId()), is(true));
 
-        token = iotService.addIotToPoll(saveNewPoll().getPollId());
+        token = iotService.addIotToPoll(saveNewPoll().getRoomCode());
         claims = jwtTokenUtil.isExpired(token);
         user = userRepository.findById(Long.parseLong(claims.getSubject())).get();
         setSecurityContextUser(user);
@@ -136,15 +136,15 @@ class AuthServiceTest extends TestUtils {
     @Test
     @Transactional
     public void iotCanConnect() {
-        assertThat(authService.iotCanConnect(1337L), is(false));
+        assertThat(authService.iotCanConnect("Verdens beste poll"), is(false));
 
         Poll poll = saveNewPoll();
-        assertThat(authService.iotCanConnect(poll.getPollId()), is(true));
+        assertThat(authService.iotCanConnect(poll.getRoomCode()), is(true));
 
         startPoll(poll);
-        assertThat(authService.iotCanConnect(poll.getPollId()), is(false));
+        assertThat(authService.iotCanConnect(poll.getRoomCode()), is(false));
 
-        assertThat(authService.iotCanConnect(saveNewPoll().getPollId()), is(true));
+        assertThat(authService.iotCanConnect(saveNewPoll().getRoomCode()), is(true));
 
     }
 }
