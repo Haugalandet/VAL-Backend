@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface PollRepository extends JpaRepository<Poll, Long> {
     List<Poll> findAllByUser(User user);
+
+    Poll findByRoomCode(String roomCode);
 }

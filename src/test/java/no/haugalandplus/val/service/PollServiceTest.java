@@ -273,4 +273,15 @@ class PollServiceTest extends TestUtils {
         pollDTO = pollService.getPoll(poll.getPollId());
         assertThat(pollDTO.getStatus(), is(PollStatusEnum.ENDED));
     }
+
+    @Test
+    @Transactional
+    public void roomCode() {
+        Poll poll = saveNewPoll();
+        assertThat(poll.getRoomCode(), notNullValue());
+
+        PollDTO pollDTO = pollService.getPollWithRoomCode(poll.getRoomCode());
+
+        assertThat(pollDTO.getPollId(), is(poll.getPollId()));
+    }
 }

@@ -30,6 +30,12 @@ public class PollController {
         return pollService.getPoll(id);
     }
 
+    @GetMapping("/room/{roomcode}")
+    public PollDTO getPollWithRoomCode(@PathVariable String roomcode) {
+        return pollService.getPollWithRoomCode(roomcode);
+    }
+
+
     @PostMapping
     public PollDTO createPoll(@RequestBody PollDTO poll) {
         return pollService.createPoll(poll);
