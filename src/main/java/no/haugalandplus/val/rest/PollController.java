@@ -1,6 +1,7 @@
 package no.haugalandplus.val.rest;
 
 import no.haugalandplus.val.dto.PollDTO;
+import no.haugalandplus.val.dto.StartPollDTO;
 import no.haugalandplus.val.dto.VoteDTO;
 import no.haugalandplus.val.service.LiveService;
 import no.haugalandplus.val.service.PollService;
@@ -62,8 +63,8 @@ public class PollController {
 
     @PostMapping("/{id}/start")
     @PreAuthorize("@authService.ownsPoll(#id)")
-    public PollDTO startPoll(@PathVariable Long id) {
-        return liveService.startPoll(id);
+    public PollDTO startPoll(@PathVariable Long id, @RequestBody StartPollDTO startPollDTO) {
+        return liveService.startPoll(id, startPollDTO);
     }
 
     @PostMapping("/{id}/end")

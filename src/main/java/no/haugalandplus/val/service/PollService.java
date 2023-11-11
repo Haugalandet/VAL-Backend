@@ -2,6 +2,7 @@ package no.haugalandplus.val.service;
 
 import no.haugalandplus.val.constants.PollStatusEnum;
 import no.haugalandplus.val.dto.PollDTO;
+import no.haugalandplus.val.dto.StartPollDTO;
 import no.haugalandplus.val.dto.VoteDTO;
 import no.haugalandplus.val.entities.Choice;
 import no.haugalandplus.val.entities.Poll;
@@ -9,7 +10,9 @@ import no.haugalandplus.val.entities.Vote;
 import no.haugalandplus.val.repository.ChoiceRepository;
 import no.haugalandplus.val.repository.PollRepository;
 import no.haugalandplus.val.repository.VoteRepository;
+import org.hibernate.sql.ast.tree.expression.Star;
 import org.modelmapper.ModelMapper;
+import org.springframework.core.SpringVersion;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +38,11 @@ public class PollService extends ServiceUtils {
     }
 
     private PollDTO convert(Poll poll) {
-        return modelMapper.map(poll, PollDTO.class);
+        PollDTO pollDTO = modelMapper.map(poll, PollDTO.class);
+        if (getCurrentUserSafe() != null) {
+            pollDTO.setHasUserVoted(voteRepository.existsByVoterAndPoll(getCurrentUserSafe(), poll));
+        }
+        return pollDTO;
     }
 
     private Poll convert(PollDTO pollDTO) {
@@ -45,36 +52,34 @@ public class PollService extends ServiceUtils {
     }
 
     public List<PollDTO> getAllPolls() {
-        return pollRepository.findAll().stream().map(this::convert).toList();
+        return pollRepository.findAll().stream().map(p->convert(processPoll(p))).toList();
     }
 
 
     public PollDTO getPoll(Long id) {
         Poll poll = pollRepository.findById(id).get();
-        return processPoll(poll);
+        return convert(processPoll(poll));
     }
 
     public PollDTO getPollWithRoomCode(String roomCode) {
         Poll poll = pollRepository.findByRoomCode(roomCode);
-        return processPoll(poll);
+        return convert(processPoll(poll));
     }
 
-    private PollDTO processPoll(Poll poll) {
-        if (poll.getStatus() == PollStatusEnum.NOT_INITIALISED) {
-            if (poll.getStartTime() != null && poll.getStartTime().before(new Date())) {
-                poll.setStatus(PollStatusEnum.ACTIVE);
-                poll = pollRepository.save(poll);
-            } else {
-                throw new RuntimeException("Poll is not opend");
-            }
+    private Poll processPoll(Poll poll) {
+        if (poll.getStatus() != PollStatusEnum.ACTIVE
+                && poll.getStartTime() != null
+                && poll.getStartTime().before(clock())) {
+            startPoll(poll, poll.getStartTime());
+            poll = pollRepository.save(poll);
         }
         if (poll.getStatus() == PollStatusEnum.ACTIVE
                 && poll.getEndTime() != null
-                && poll.getEndTime().before(new Date())) {
+                && poll.getEndTime().before(clock())) {
             poll.setStatus(PollStatusEnum.ENDED);
             poll = pollRepository.save(poll);
         }
-        return convert(poll);
+        return poll;
     }
 
     public PollDTO updatePollResult(Long id) {
@@ -113,24 +118,60 @@ public class PollService extends ServiceUtils {
         voteRepository.save(vote);
     }
 
-    public PollDTO start(Long pollId) {
+    public PollDTO start(Long pollId, StartPollDTO startPollDTO) {
         Poll poll = pollRepository.findById(pollId).get();
-        if (poll.getStatus() != PollStatusEnum.NOT_INITIALISED) {
-            throw new AccessDeniedException("Poll can not be activated. Has status " + poll.getStatus().toString());
+        poll = processPoll(poll);
+        if (poll.getStatus() == PollStatusEnum.ACTIVE) {
+            throw new AccessDeniedException("Poll can not be activated.");
         }
-        poll.setStartTime(new Date());
-        poll.setStatus(PollStatusEnum.ACTIVE);
+        if (startPollDTO != null) {
+            if (startPollDTO.getStartTime() != null) {
+                if (startPollDTO.getStartTime().before(clock())) {
+                    throw new RuntimeException("Time already past");
+                }
+                poll.setStartTime(startPollDTO.getStartTime());
+            } else {
+                startPoll(poll);
+            }
+
+            if (startPollDTO.getEndTime() != null && startPollDTO.getEndTime().before(clock())) {
+                throw new RuntimeException("Time already past");
+            }
+            poll.setEndTime(startPollDTO.getEndTime());
+        } else {
+            startPoll(poll);
+        }
+
         return convert(pollRepository.save(poll));
+    }
+
+    private void startPoll(Poll poll) {
+        startPoll(poll, clock());
+    }
+
+    private void startPoll(Poll poll, Date startTime) {
+        poll.setStartTime(startTime);
+        poll.setStatus(PollStatusEnum.ACTIVE);
+        poll.getChoices().forEach( c -> {
+            c.setVoteCount(0);
+            choiceRepository.save(c);
+            voteRepository.deleteAllByChoice(c);
+        });
     }
 
     public PollDTO end(Long pollId) {
         Poll poll = pollRepository.findById(pollId).get();
+        poll = processPoll(poll);
         if (poll.getStatus() != PollStatusEnum.ACTIVE) {
             throw new AccessDeniedException("Poll can not be ended. Has status " + poll.getStatus().toString());
         }
-        poll.setEndTime(new Date());
+        poll.setEndTime(clock());
         poll.setStatus(PollStatusEnum.ENDED);
         ioTService.removeIot(poll);
         return convert(pollRepository.save(poll));
+    }
+
+    protected Date clock() {
+        return new Date();
     }
 }

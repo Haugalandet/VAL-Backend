@@ -4,6 +4,7 @@ import no.haugalandplus.val.TestUtils;
 import no.haugalandplus.val.constants.PollStatusEnum;
 import no.haugalandplus.val.dto.ChoiceDTO;
 import no.haugalandplus.val.dto.PollDTO;
+import no.haugalandplus.val.dto.StartPollDTO;
 import no.haugalandplus.val.dto.VoteDTO;
 import no.haugalandplus.val.entities.Choice;
 import no.haugalandplus.val.entities.Poll;
@@ -29,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 class PollServiceTest extends TestUtils {
 
     @Autowired
-    private PollService pollService;
+    private PollServiceMock pollService;
 
     @Autowired
     private PollRepository pollRepository;
@@ -88,14 +89,7 @@ class PollServiceTest extends TestUtils {
 
         assertThat(pollService.getAllPolls(), hasSize(2));
 
-        try {
-            assertThat(pollService.getPoll(poll.getPollId()), notNullValue());
-            fail("The poll is not active, and should not return");
-        } catch (Exception e) {
-            // Ayyyy
-        }
-
-        pollService.start(poll.getPollId());
+        pollService.start(poll.getPollId(), null);
 
         assertThat(pollService.getPoll(poll.getPollId()), notNullValue());
         assertThat(pollService.getPoll(poll.getPollId()).getChoices(), hasSize(2));
@@ -110,94 +104,13 @@ class PollServiceTest extends TestUtils {
         Poll poll = saveNewPoll();
         poll = addChoices(poll);
 
-        pollService.start(poll.getPollId());
+        pollService.start(poll.getPollId(), null);
 
         PollDTO pollDTO = pollService.getPoll(poll.getPollId());
 
         assertThat(pollDTO.getPollId(), is(poll.getPollId()));
         assertThat(pollDTO.getChoices(), hasSize(2));
     }
-
-    /*
-    @Test
-    @Transactional
-    public void voteTest() {
-        setSecurityContextUser();
-        Poll poll = saveNewPoll();
-        poll = addChoices(poll);
-
-        Choice choice = poll.getChoices().get(0);
-
-        VoteDTO vote = new VoteDTO();
-        vote.setChoiceId(choice.getChoiceId());
-
-        try {
-            pollService.vote(poll.getPollId(), vote);
-            fail();
-        } catch (Exception e) {
-            assertThat(e, instanceOf(Exception.class));
-        }
-
-        pollService.start(poll.getPollId());
-
-        pollService.vote(poll.getPollId(), vote);
-
-        List<Vote> votes = voteRepository.findAll();
-        assertThat(votes, hasSize(1));
-        assertThat(votes.get(0).getVoteCount(), is(1));
-
-        PollDTO pollDTO = pollService.getPoll(poll.getPollId());
-        assertThat(pollDTO.getChoices(), hasSize(2));
-
-        ChoiceDTO choiceDTO = pollDTO.getChoices().get(0);
-
-        assertThat(choiceDTO.getVoteCount(), is(0L));
-
-        pollService.updatePollResult(poll.getPollId());
-
-        pollDTO = pollService.getPoll(poll.getPollId());
-        assertThat(pollDTO.getChoices(), hasSize(2));
-
-        choiceDTO = pollDTO.getChoices().get(0);
-
-        assertThat(choiceDTO.getVoteCount(), is(1L));
-
-        pollService.end(poll.getPollId());
-
-        try {
-            pollService.vote(poll.getPollId(), vote);
-            fail();
-        } catch (Exception e) {
-            assertThat(e, instanceOf(Exception.class));
-        }
-    }
-
-    @Test
-    @Transactional
-    public void voteLoginPollTest() {
-        setSecurityContextUser();
-        Poll poll = saveNewPoll();
-        poll = addChoices(poll);
-        poll.setNeedLogin(true);
-        poll = pollRepository.save(poll);
-
-        pollService.start(poll.getPollId());
-
-        Choice choice = poll.getChoices().get(0);
-
-        VoteDTO vote = new VoteDTO();
-        vote.setChoiceId(choice.getChoiceId());
-
-        pollService.vote(poll.getPollId(), vote);
-
-        try {
-            pollService.vote(poll.getPollId(), vote);
-            fail();
-        } catch (Exception e) {
-            assertThat(e, instanceOf(Exception.class));
-        }
-    }
-    */
 
     @Test
     @Transactional
@@ -212,10 +125,10 @@ class PollServiceTest extends TestUtils {
             assertThat(e, instanceOf(Exception.class));
         }
 
-        pollService.start(poll.getPollId());
+        pollService.start(poll.getPollId(), null);
 
         try {
-            pollService.start(poll.getPollId());
+            pollService.start(poll.getPollId(), null);
             fail();
         } catch (Exception e) {
             assertThat(e, instanceOf(Exception.class));
@@ -224,8 +137,6 @@ class PollServiceTest extends TestUtils {
         pollService.end(poll.getPollId());
 
         try {
-            pollService.start(poll.getPollId());
-            fail();
             pollService.end(poll.getPollId());
             fail();
         } catch (Exception e) {
@@ -239,28 +150,17 @@ class PollServiceTest extends TestUtils {
         Poll poll = saveNewPoll();
         poll = addChoices(poll);
 
-        try {
-            PollDTO pollDTO = pollService.getPoll(poll.getPollId());
-            fail("poll is not stated. Should not return");
-        } catch (Exception e) {
-            // Eyyy
-        }
-
         poll.setStartTime(new Date(16440544000000L));
         poll = pollRepository.save(poll);
 
-        try {
-            PollDTO pollDTO = pollService.getPoll(poll.getPollId());
-            fail("poll is not stated. Should not return");
-        } catch (Exception e) {
-            // Eyyy
-        }
+        PollDTO pollDTO = pollService.getPoll(poll.getPollId());
+        assertThat(pollDTO.getStatus(), is(PollStatusEnum.NOT_INITIALISED));
 
         poll.setStartTime(new Date(1644054400000L));
         poll = pollRepository.save(poll);
 
 
-        PollDTO pollDTO = pollService.getPoll(poll.getPollId());
+        pollDTO = pollService.getPoll(poll.getPollId());
         assertThat(pollDTO.getStatus(), is(PollStatusEnum.ACTIVE));
 
         poll.setEndTime(new Date(16440544000000L));
@@ -282,17 +182,131 @@ class PollServiceTest extends TestUtils {
         Poll poll = saveNewPoll();
         assertThat(poll.getRoomCode(), notNullValue());
 
-        try {
-            PollDTO pollDTO = pollService.getPollWithRoomCode(poll.getRoomCode());
-            fail();
-        } catch (Exception e) {
-            // YaYa
-        }
-
         startPoll(poll);
 
         PollDTO pollDTO = pollService.getPollWithRoomCode(poll.getRoomCode());
 
         assertThat(pollDTO.getPollId(), is(poll.getPollId()));
+    }
+
+    @Test
+    @Transactional
+    public void startDeleteVotesOnRestart() {
+        User user = saveNewUser();
+        Poll poll = saveNewPoll(user);
+        poll = addChoices(poll);
+
+        setSecurityContextUser(user);
+
+        pollService.start(poll.getPollId(), new StartPollDTO());
+
+        VoteDTO v = new VoteDTO();
+        v.setChoiceId(poll.getChoices().get(0).getChoiceId());
+
+        pollService.vote(poll.getPollId(), v);
+        pollService.vote(poll.getPollId(), v);
+
+        PollDTO pollDTO = pollService.updatePollResult(poll.getPollId());
+
+        assertThat(voteRepository.count(), is(2L));
+        assertThat(pollDTO.getChoices().get(0).getVoteCount(), is(2L));
+
+        pollDTO = pollService.end(pollDTO.getPollId());
+
+        assertThat(voteRepository.count(), is(2L));
+        assertThat(pollDTO.getChoices().get(0).getVoteCount(), is(2L));
+
+        pollDTO = pollService.start(pollDTO.getPollId(), new StartPollDTO());
+
+        assertThat(voteRepository.count(), is(0L));
+        assertThat(pollDTO.getChoices().get(0).getVoteCount(), is(0L));
+    }
+
+    @Test
+    @Transactional
+    public void startNowTimedEnd() {
+        User user = saveNewUser();
+        Poll poll = saveNewPoll(user);
+        poll = addChoices(poll);
+
+        setSecurityContextUser(user);
+
+        long time = 10000000L;
+
+        pollService.setCurrentDate(new Date(time));
+
+        StartPollDTO startPollDTO = new StartPollDTO();
+        startPollDTO.setEndTime(new Date(time + 1000));
+
+        pollService.start(poll.getPollId(), startPollDTO);
+
+        poll = pollRepository.findById(poll.getPollId()).get();
+
+        assertThat(poll.getStatus(), is(PollStatusEnum.ACTIVE));
+        assertThat(poll.getStartTime(), is(new Date(time)));
+
+        pollService.setCurrentDate(new Date(time + 100000));
+
+        PollDTO pollDTO = pollService.getPoll(poll.getPollId());
+
+        assertThat(pollDTO.getStatus(), is(PollStatusEnum.ENDED));
+    }
+
+    @Test
+    @Transactional
+    public void timedStartAndEnd() {
+        User user = saveNewUser();
+        Poll poll = saveNewPoll(user);
+        poll = addChoices(poll);
+
+        setSecurityContextUser(user);
+
+        long time = 10000000L;
+
+        pollService.setCurrentDate(new Date(time));
+
+        StartPollDTO startPollDTO = new StartPollDTO();
+        startPollDTO.setEndTime(new Date(time + 1000));
+        startPollDTO.setStartTime(new Date(time + 100));
+
+        pollService.start(poll.getPollId(), startPollDTO);
+
+        PollDTO pollDTO = pollService.getPoll(poll.getPollId());
+        assertThat(pollDTO.getStatus(), is(PollStatusEnum.NOT_INITIALISED));
+
+        pollService.setCurrentDate(new Date(time + 200));
+
+        pollDTO = pollService.getPoll(poll.getPollId());
+        assertThat(pollDTO.getStatus(), is(PollStatusEnum.ACTIVE));
+
+        pollService.setCurrentDate(new Date(time + 100000));
+
+        pollDTO = pollService.getPoll(poll.getPollId());
+        assertThat(pollDTO.getStatus(), is(PollStatusEnum.ENDED));
+    }
+
+    @Test
+    @Transactional
+    public void hasVotedTest() {
+        Poll poll = saveNewPoll();
+        poll = addChoices(poll);
+
+        PollDTO pollDTO = pollService.getPoll(poll.getPollId());
+        assertThat(pollDTO.getHasUserVoted(), nullValue());
+
+        User user = saveNewUser();
+        setSecurityContextUser(user);
+
+        pollDTO = pollService.getPoll(poll.getPollId());
+        assertThat(pollDTO.getHasUserVoted(), is(false));
+
+        startPoll(poll);
+
+        VoteDTO voteDTO = new VoteDTO();
+        voteDTO.setChoiceId(poll.getChoices().get(0).getChoiceId());
+        pollService.vote(pollDTO.getPollId(), voteDTO);
+
+        pollDTO = pollService.getPoll(poll.getPollId());
+        assertThat(pollDTO.getHasUserVoted(), is(true));
     }
 }

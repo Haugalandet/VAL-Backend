@@ -54,7 +54,7 @@ public class AuthService extends ServiceUtils {
                 return false;
             }
             if (poll.isNeedLogin()) {
-                return isLoggedIn() && !voteRepository.existsByVoterAndChoice(getCurrentUser(), choice);
+                return isLoggedIn() && !voteRepository.existsByVoterAndPoll(getCurrentUser(), poll);
             }
             return true;
         } catch (Exception e) {

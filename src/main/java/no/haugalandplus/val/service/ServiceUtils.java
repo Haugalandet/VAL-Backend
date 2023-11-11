@@ -12,15 +12,14 @@ public class ServiceUtils {
         if (auth == null) {
             return null;
         }
-        return (User) auth.getPrincipal();
+        if (auth.getPrincipal() instanceof User user) {
+            return user;
+        }
+        return null;
     }
 
     protected User getCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) {
-            throw new AccessDeniedException("Not logged in");
-        }
-        User user = (User) auth.getPrincipal();
+        User user = getCurrentUserSafe();
         if (user == null) {
             throw new AccessDeniedException("Not logged in");
         }
