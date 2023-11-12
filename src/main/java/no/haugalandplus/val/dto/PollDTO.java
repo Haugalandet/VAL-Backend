@@ -16,6 +16,7 @@ public class PollDTO {
     private boolean anon;
     private Date startTime;
     private Date endTime;
+    private String roomCode;
     private PollStatusEnum status;
     private List<ChoiceDTO> choices;
     private Boolean hasUserVoted;

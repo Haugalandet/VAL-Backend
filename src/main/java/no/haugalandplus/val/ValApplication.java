@@ -36,69 +36,8 @@ public class ValApplication {
 
 		return modelMapper;
 	}
-	@Bean
-	public WebMvcConfigurer corsConfigurer() {
-		return new WebMvcConfigurer() {
-			@Override
-			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**").allowedOrigins("*");
-			}
-		};
-	}
-
-	private static PollRepository pollRepository;
-
-	private static UserRepository userRepository;
-
-	private static UserService userService;
-
-
-	private static VoteRepository voteRepository;
-
-
 
 	public static void main(String[] args) {
 		ApplicationContext context = SpringApplication.run(ValApplication.class, args);
-
-		// Inits repos
-
-//		configRepository = context.getBean(ConfigRepository.class);
-//		pollRepository = context.getBean(PollRepository.class);
-//		userService = context.getBean(UserService.class);
-//		voteRepository = context.getBean(VoteRepository.class);
-//		pollInstRepository = context.getBean(PollInstRepository.class);
-//
-//
-//		// Creates test data
-//
-//		User nils = new User("NilsMichael", "Fitjar");
-//		User user = new User("adm", "pas");
-//
-//		userService.insertUser(user);
-//		User helene = new User("HeleneSineNotatarHubert", "Solhaug");
-//		User lasse = new User("LasseLarsMartin", "Taraldset");
-//
-//
-//		Config config = new Config(nils);
-//
-//		config.setConfigName("Default Config");
-//
-//		config.setDescription("Default configuration for a poll");
-//
-//		config.setAnon(false);
-//
-//		Poll poll = new Poll(nils, config);
-//
-//		PollInst pollInst = new PollInst();
-//		pollInst.setPoll(poll);
-//
-//		userRepository.saveAll(Arrays.asList(nils, martin, helene, lasse));
-//		configRepository.save(config);
-//		pollRepository.save(poll);
-//
-//		pollInstRepository.save(pollInst);
-
 	}
-
-
 }
