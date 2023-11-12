@@ -33,7 +33,7 @@ public class Poll {
     @ManyToOne
     private User user;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "poll")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "poll", fetch=FetchType.EAGER)
     private List<Choice> choices = new ArrayList<>();
 
     @OneToMany

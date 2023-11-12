@@ -1,6 +1,7 @@
 package no.haugalandplus.val.config;
 
 import no.haugalandplus.val.auth.JwtTokenAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,14 +13,19 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 public class SecurityConfig {
 
     private final JwtTokenAuthenticationFilter jwtTokenAuthenticationFilter;
 
-    public SecurityConfig(JwtTokenAuthenticationFilter jwtTokenAuthenticationFilter) {
+    public final CorsConfigurationSource corsConfigurationSource;
+
+
+    public SecurityConfig(JwtTokenAuthenticationFilter jwtTokenAuthenticationFilter, @Qualifier("corsWebFilter") CorsConfigurationSource corsConfigurationSource) {
         this.jwtTokenAuthenticationFilter = jwtTokenAuthenticationFilter;
+        this.corsConfigurationSource = corsConfigurationSource;
     }
 
     @Bean
@@ -43,7 +49,8 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable);
+        http.csrf(AbstractHttpConfigurer::disable)
+                .cors(c -> c.configurationSource(corsConfigurationSource));
         return http.build();
     }
 }
