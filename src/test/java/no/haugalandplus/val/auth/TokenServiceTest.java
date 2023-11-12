@@ -10,12 +10,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.jupiter.api.Assertions.fail;
 
 @SpringBootTest
+@ActiveProfiles("test")
 class TokenServiceTest extends TestUtils {
 
     @Autowired
@@ -40,6 +43,7 @@ class TokenServiceTest extends TestUtils {
     }
 
     @Test
+    @Transactional
     public void testCreateToken() {
         TokenService tokenService = new TokenService(authenticationManager, jwrTokenUtil);
 

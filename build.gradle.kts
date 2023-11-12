@@ -30,17 +30,23 @@ dependencies {
 	implementation("org.springframework.security:spring-security-core:6.1.4")
 	implementation("org.springframework.security:spring-security-config:6.1.4")
 	implementation("org.springframework.security:spring-security-web:6.1.4")
-	testImplementation("junit:junit:4.13.1")
-	compileOnly("org.projectlombok:lombok")
-	developmentOnly("org.springframework.boot:spring-boot-devtools")
-	annotationProcessor("org.projectlombok:lombok")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	implementation("org.springframework.boot:spring-boot-starter-webflux:3.1.5")
 	implementation("io.jsonwebtoken:jjwt-api:0.12.2")
+
+	compileOnly("org.projectlombok:lombok")
+
+	developmentOnly("org.springframework.boot:spring-boot-devtools")
+
+	annotationProcessor("org.projectlombok:lombok")
+
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.2")
 	runtimeOnly("io.jsonwebtoken:jjwt-orgjson:0.12.2")
+
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.hamcrest:hamcrest:2.1")
 	testImplementation("org.mockito:mockito-core:3.12.4")
-	implementation("org.springframework.boot:spring-boot-starter-webflux:3.1.5")
+	testImplementation("junit:junit:4.13.1")
+	testImplementation("com.h2database:h2")
 }
 
 tasks.withType<Test> {

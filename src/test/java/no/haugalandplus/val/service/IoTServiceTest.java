@@ -14,6 +14,7 @@ import no.haugalandplus.val.repository.VoteRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.fail;
 
 @SpringBootTest
+@ActiveProfiles("test")
 class IoTServiceTest extends TestUtils {
 
     @Autowired
@@ -94,6 +96,8 @@ class IoTServiceTest extends TestUtils {
         VoteDTO vote = new VoteDTO();
         vote.setChoiceId(poll.getChoices().get(0).getChoiceId());
         vote.setVoteCount(100L);
+
+        assertThat(voteRepository.findAll(), hasSize(0));
 
         ioTService.vote(poll.getPollId(), List.of(vote));
 
