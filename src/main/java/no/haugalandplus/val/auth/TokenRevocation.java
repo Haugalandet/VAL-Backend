@@ -9,6 +9,7 @@ import java.util.Date;
 @Entity
 @Getter
 @Setter
+@Table(indexes = @Index(columnList = "jwtId"))
 public class TokenRevocation {
 
     @Id

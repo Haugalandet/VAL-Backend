@@ -1,6 +1,5 @@
 package no.haugalandplus.val.service;
 
-import lombok.Getter;
 import no.haugalandplus.val.constants.PollStatusEnum;
 import no.haugalandplus.val.dto.PollDTO;
 import no.haugalandplus.val.dto.StartPollDTO;
@@ -11,6 +10,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -22,20 +22,24 @@ public class LiveService {
     private final Map<Long, PollHandler> pollMap = new ConcurrentHashMap<>();
     private final PollService pollService;
 
-    public LiveService(PollService pollService) {
+    private final IoTService iotService;
+
+    public LiveService(PollService pollService, IoTService iotService) {
         this.pollService = pollService;
+        this.iotService = iotService;
     }
 
     public Sinks.Many<PollDTO> getPollSink(Long pollId) {
-        PollHandler poll = pollMap.computeIfAbsent(pollId, k -> new PollHandler(pollId, Sinks.many().multicast().onBackpressureBuffer()));
-        return poll.getPollSinks();
+        return getPollHandler(pollId).getPollSinks();
+    }
+
+    private PollHandler getPollHandler(Long pollId) {
+        return pollMap.computeIfAbsent(pollId, k -> new PollHandler(pollId));
     }
 
     public void sendUpdateToPoll(Long pollId) {
-        PollHandler poll = pollMap.get(pollId);
-        if (poll != null) {
-            poll.sendUpdate();
-        }
+        PollHandler poll = getPollHandler(pollId);
+        poll.sendUpdate();
     }
 
     public PollDTO startPoll(Long pollId, StartPollDTO startPollDTO) {
@@ -55,28 +59,33 @@ public class LiveService {
         sendUpdateToPoll(id);
     }
 
+    public void iotVote(Long id, List<VoteDTO> votes) {
+        iotService.vote(id, votes);
+        sendUpdateToPoll(id);
+    }
+
+
     @Scheduled(fixedRate = 10*60*1000)
     public void cleanupExpiredPolls() {
         pollMap.entrySet().removeIf(entry -> entry.getValue().isEmpty());
     }
 
+
     private class PollHandler {
         private final Long pollId;
-        @Getter
-        private final Sinks.Many<PollDTO> pollSinks;
+        private Sinks.Many<PollDTO> pollSinks;
         private final AtomicBoolean scheduled;
         private final AtomicLong lastEvent;
 
-        private PollHandler(Long pollId, Sinks.Many<PollDTO> pollSinks) {
+        private PollHandler(Long pollId) {
             this.pollId = pollId;
-            this.pollSinks = pollSinks;
             this.scheduled = new AtomicBoolean(false);
             this.lastEvent = new AtomicLong(0);
         }
 
         public void sendUpdate() {
             synchronized (lastEvent) {
-                Long dif = System.currentTimeMillis() - lastEvent.get();
+                long dif = System.currentTimeMillis() - lastEvent.get();
                 if (dif >= delay) {
                     sendEvent();
                 }
@@ -97,14 +106,23 @@ public class LiveService {
         private void sendEvent() {
             lastEvent.set(System.currentTimeMillis());
             PollDTO poll = pollService.updatePollResult(pollId);
-            pollSinks.tryEmitNext(poll);
-            if (poll.getStatus() == PollStatusEnum.ENDED) {
-                pollSinks.tryEmitComplete();
+            if (pollSinks != null) {
+                pollSinks.tryEmitNext(poll);
+                if (poll.getStatus() == PollStatusEnum.ENDED) {
+                    pollSinks.tryEmitComplete();
+                }
             }
         }
 
         public boolean isEmpty() {
-            return pollSinks.currentSubscriberCount() == 0;
+            return pollSinks == null || pollSinks.currentSubscriberCount() == 0;
+        }
+
+        public Sinks.Many<PollDTO> getPollSinks() {
+            if (pollSinks == null) {
+                pollSinks = Sinks.many().multicast().onBackpressureBuffer();
+            }
+            return pollSinks;
         }
     }
 }

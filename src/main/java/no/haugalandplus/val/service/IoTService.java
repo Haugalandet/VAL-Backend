@@ -54,7 +54,7 @@ public class IoTService extends ServiceUtils {
         return jwtTokenUtil.createJWT(iot.getUserId());
     }
 
-    public Poll removeIot(Poll poll) {
+    public void removeIot(Poll poll) {
         List<User> iotList = poll.getIotList();
         poll.setIotList(new ArrayList<>());
         pollRepository.save(poll);
@@ -63,7 +63,6 @@ public class IoTService extends ServiceUtils {
                     .filter(iot -> iot.getUserType() == UserTypeEnum.IOT)
                     .toList()
         );
-        return poll;
     }
 
     public void vote(Long id, List<VoteDTO> votes) {
