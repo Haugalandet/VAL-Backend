@@ -1,7 +1,9 @@
 package no.haugalandplus.val.service;
 
 import lombok.Getter;
+import no.haugalandplus.val.constants.PollStatusEnum;
 import no.haugalandplus.val.dto.PollDTO;
+import no.haugalandplus.val.dto.StartPollDTO;
 import no.haugalandplus.val.dto.VoteDTO;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -36,8 +38,8 @@ public class LiveService {
         }
     }
 
-    public PollDTO startPoll(Long pollId) {
-        PollDTO pollDTO = pollService.start(pollId);
+    public PollDTO startPoll(Long pollId, StartPollDTO startPollDTO) {
+        PollDTO pollDTO = pollService.start(pollId, startPollDTO);
         sendUpdateToPoll(pollId);
         return pollDTO;
     }
@@ -94,7 +96,11 @@ public class LiveService {
 
         private void sendEvent() {
             lastEvent.set(System.currentTimeMillis());
-            pollSinks.tryEmitNext(pollService.updatePollResult(pollId));
+            PollDTO poll = pollService.updatePollResult(pollId);
+            pollSinks.tryEmitNext(poll);
+            if (poll.getStatus() == PollStatusEnum.ENDED) {
+                pollSinks.tryEmitComplete();
+            }
         }
 
         public boolean isEmpty() {

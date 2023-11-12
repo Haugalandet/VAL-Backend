@@ -10,8 +10,11 @@ import org.springframework.data.repository.query.Param;
 
 public interface VoteRepository extends JpaRepository<Vote, Long> {
 
-    Boolean existsByVoterAndChoice(User voter, Choice poll);
+    @Query("select (count(v) > 0) from Vote v where v.choice.poll = :poll and v.voter = :voter")
+    Boolean existsByVoterAndPoll(@Param("voter") User voter, @Param("poll") Poll poll);
 
     @Query("select coalesce(sum(v.voteCount), 0) from Vote v where v.choice.ChoiceId = :choiceId")
     Long sumOfVotesByChoiceId(@Param("choiceId") Long choiceId);
+
+    void deleteAllByChoice(Choice choice);
 }

@@ -18,4 +18,5 @@ public class PollDTO {
     private Date endTime;
     private PollStatusEnum status;
     private List<ChoiceDTO> choices;
+    private Boolean hasUserVoted;
 }
