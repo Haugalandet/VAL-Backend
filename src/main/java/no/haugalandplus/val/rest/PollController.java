@@ -51,8 +51,8 @@ public class PollController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("@authService.ownsPoll(#id)")
-    public PollDTO deletePoll(@PathVariable Long id) {
-        return pollService.deletePoll(id);
+    public void deletePoll(@PathVariable Long id) {
+        pollService.deletePoll(id);
     }
 
     @PostMapping("/{id}/votes")

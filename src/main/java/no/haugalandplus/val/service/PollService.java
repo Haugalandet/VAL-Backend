@@ -10,13 +10,11 @@ import no.haugalandplus.val.entities.Vote;
 import no.haugalandplus.val.repository.ChoiceRepository;
 import no.haugalandplus.val.repository.PollRepository;
 import no.haugalandplus.val.repository.VoteRepository;
-import org.hibernate.sql.ast.tree.expression.Star;
 import org.modelmapper.ModelMapper;
-import org.springframework.core.SpringVersion;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -99,11 +97,10 @@ public class PollService extends ServiceUtils {
         return convert(pollRepository.save(poll));
     }
 
-
-    public PollDTO deletePoll(Long id) {
-        Poll poll = pollRepository.findById(id).get();
-        pollRepository.delete(poll);
-        return convert(poll);
+    @Transactional
+    public void deletePoll(Long id) {
+        voteRepository.deleteAllByPollId(id);
+        pollRepository.deleteAllByPollId(id);
     }
 
     public List<PollDTO> getAllPollsByCurrentUser() {
@@ -155,8 +152,8 @@ public class PollService extends ServiceUtils {
         poll.getChoices().forEach( c -> {
             c.setVoteCount(0);
             choiceRepository.save(c);
-            voteRepository.deleteAllByChoice(c);
         });
+        voteRepository.deleteAllByPoll(poll);
     }
 
     public PollDTO end(Long pollId) {
@@ -173,5 +170,12 @@ public class PollService extends ServiceUtils {
 
     protected Date clock() {
         return new Date();
+    }
+
+    public void deletePollsByUserId(Long userId) {
+        voteRepository.deleteAllByUserId(userId);
+        choiceRepository.deleteAllByUserId(userId);
+        pollRepository.deleteAllByUserId(userId);
+        voteRepository.anonymizeAllVotesWithUserId(userId);
     }
 }
