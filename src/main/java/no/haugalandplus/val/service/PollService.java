@@ -10,13 +10,10 @@ import no.haugalandplus.val.entities.Vote;
 import no.haugalandplus.val.repository.ChoiceRepository;
 import no.haugalandplus.val.repository.PollRepository;
 import no.haugalandplus.val.repository.VoteRepository;
-import org.hibernate.sql.ast.tree.expression.Star;
 import org.modelmapper.ModelMapper;
-import org.springframework.core.SpringVersion;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
-import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -155,8 +152,8 @@ public class PollService extends ServiceUtils {
         poll.getChoices().forEach( c -> {
             c.setVoteCount(0);
             choiceRepository.save(c);
-            voteRepository.deleteAllByChoice(c);
         });
+        voteRepository.deleteAllByPoll(poll);
     }
 
     public PollDTO end(Long pollId) {

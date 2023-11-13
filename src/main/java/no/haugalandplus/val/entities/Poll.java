@@ -36,7 +36,7 @@ public class Poll {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "poll", fetch=FetchType.EAGER)
     private List<Choice> choices = new ArrayList<>();
 
-    @OneToMany
+    @OneToMany(fetch=FetchType.EAGER)
     private List<User> iotList = new ArrayList<>();
 
     public void addChoice(Choice choice) {

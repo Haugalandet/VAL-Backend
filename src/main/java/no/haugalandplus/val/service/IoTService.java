@@ -55,14 +55,10 @@ public class IoTService extends ServiceUtils {
     }
 
     public void removeIot(Poll poll) {
+        userRepository.deleteAll(poll.getIotList());
         List<User> iotList = poll.getIotList();
         poll.setIotList(new ArrayList<>());
         pollRepository.save(poll);
-        userRepository.deleteAll(
-                iotList.stream()
-                    .filter(iot -> iot.getUserType() == UserTypeEnum.IOT)
-                    .toList()
-        );
     }
 
     public void vote(Long id, List<VoteDTO> votes) {

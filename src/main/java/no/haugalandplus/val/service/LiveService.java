@@ -119,7 +119,7 @@ public class LiveService {
         }
 
         public Sinks.Many<PollDTO> getPollSinks() {
-            if (pollSinks == null) {
+            if (pollSinks == null || pollSinks.currentSubscriberCount() == 0) {
                 pollSinks = Sinks.many().multicast().onBackpressureBuffer();
             }
             return pollSinks;
