@@ -8,17 +8,18 @@ import no.haugalandplus.val.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
 public class UserService {
 
-    private UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final PollService pollService;
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, PollService pollService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.pollService = pollService;
     }
 
     public UserDTO insertUser(CreateUserDTO userDTO) {
@@ -34,6 +35,7 @@ public class UserService {
     }
 
     public void removeUser(Long userId) {
+        pollService.deletePollsByUserId(userId);
         userRepository.deleteById(userId);
     }
 
@@ -59,10 +61,6 @@ public class UserService {
         return convertToDTO(user);
     }
 
-    public List<UserDTO> getAllUsers() {
-        return userRepository.findAll().stream()
-                .map(this::convertToDTO).toList();
-    }
 
     public UserDTO convertToDTO(User user) {
         UserDTO userDTO = new UserDTO();

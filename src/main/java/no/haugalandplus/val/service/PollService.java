@@ -13,6 +13,7 @@ import no.haugalandplus.val.repository.VoteRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -96,11 +97,10 @@ public class PollService extends ServiceUtils {
         return convert(pollRepository.save(poll));
     }
 
-
-    public PollDTO deletePoll(Long id) {
-        Poll poll = pollRepository.findById(id).get();
-        pollRepository.delete(poll);
-        return convert(poll);
+    @Transactional
+    public void deletePoll(Long id) {
+        voteRepository.deleteAllByPollId(id);
+        pollRepository.deleteAllByPollId(id);
     }
 
     public List<PollDTO> getAllPollsByCurrentUser() {
@@ -170,5 +170,12 @@ public class PollService extends ServiceUtils {
 
     protected Date clock() {
         return new Date();
+    }
+
+    public void deletePollsByUserId(Long userId) {
+        voteRepository.deleteAllByUserId(userId);
+        choiceRepository.deleteAllByUserId(userId);
+        pollRepository.deleteAllByUserId(userId);
+        voteRepository.anonymizeAllVotesWithUserId(userId);
     }
 }

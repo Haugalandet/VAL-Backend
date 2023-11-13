@@ -1,6 +1,5 @@
 package no.haugalandplus.val.repository;
 
-import no.haugalandplus.val.entities.Choice;
 import no.haugalandplus.val.entities.Poll;
 import no.haugalandplus.val.entities.User;
 import no.haugalandplus.val.entities.Vote;
@@ -22,4 +21,19 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
     @Modifying
     @Query("delete from Vote v where v.choice.poll = :poll")
     void deleteAllByPoll(@Param("poll") Poll poll);
+
+    @Transactional
+    @Modifying
+    @Query("delete from Vote v where v.choice.poll.user.userId = :userId")
+    void deleteAllByUserId(@Param("userId") Long userId);
+
+    @Transactional
+    @Modifying
+    @Query("update Vote v set v.voter = null where v.voter.userId = :userId")
+    void anonymizeAllVotesWithUserId(@Param("userId") Long userId);
+
+    @Transactional
+    @Modifying
+    @Query("delete from Vote v where v.choice.poll.pollId = :pollId")
+    void deleteAllByPollId(@Param("pollId") Long pollId);
 }

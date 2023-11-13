@@ -311,4 +311,35 @@ class PollServiceTest extends TestUtils {
         pollDTO = pollService.getPoll(poll.getPollId());
         assertThat(pollDTO.getHasUserVoted(), is(true));
     }
+
+    @Test
+    @Transactional
+    public void deletePoll() {
+        Poll poll = saveNewPoll();
+        poll = addChoices(poll);
+
+        PollDTO pollDTO = pollService.getPoll(poll.getPollId());
+        assertThat(pollDTO.getHasUserVoted(), nullValue());
+
+        User user = saveNewUser();
+        setSecurityContextUser(user);
+
+        pollDTO = pollService.getPoll(poll.getPollId());
+        assertThat(pollDTO.getHasUserVoted(), is(false));
+
+        startPoll(poll);
+
+        VoteDTO voteDTO = new VoteDTO();
+        voteDTO.setChoiceId(poll.getChoices().get(0).getChoiceId());
+        pollService.vote(pollDTO.getPollId(), voteDTO);
+
+        assertThat(voteRepository.count(), is(1L));
+
+        pollService.deletePoll(poll.getPollId());
+
+        assertThat(voteRepository.count(), is(0L));
+        assertThat(choiceRepository.count(), is(0L));
+        assertThat(pollRepository.count(), is(0L));
+
+    }
 }

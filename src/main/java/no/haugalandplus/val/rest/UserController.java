@@ -44,9 +44,4 @@
         public UserDTO getUser(@PathVariable Long id) {
             return userservice.getUser(id);
         }
-
-        @GetMapping
-        public List<UserDTO> getAllUsers() {
-            return userservice.getAllUsers();
-        }
     }
