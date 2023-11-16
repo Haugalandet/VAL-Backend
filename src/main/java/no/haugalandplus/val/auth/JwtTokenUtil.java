@@ -3,7 +3,9 @@ package no.haugalandplus.val.auth;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,9 +23,10 @@ import java.util.UUID;
 @Component
 public class JwtTokenUtil {
 
-    private final SecretKey secretKey = Jwts.SIG.HS256.key().build();
+    @Value("${jwt.secretKey}")
+    private String secretKey = "Dette er min tipp topp hemmelige nøkkelt ting!";
     private final Long expireTime = 15 * 60 * 1000L;
-    private TokenRevocationRepository tokenRevocationRepository;
+    private final TokenRevocationRepository tokenRevocationRepository;
 
     @Autowired
     public JwtTokenUtil(TokenRevocationRepository tokenRevocationRepository) {
@@ -42,7 +45,7 @@ public class JwtTokenUtil {
     private Claims claimsFromJwt(String token) {
         try {
             return Jwts.parser()
-                    .verifyWith(secretKey)
+                    .verifyWith(getSecretKey())
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
@@ -62,7 +65,7 @@ public class JwtTokenUtil {
                 .issuedAt(now)
                 .expiration(expires)
                 .id(UUID.randomUUID().toString())
-                .signWith(secretKey)
+                .signWith(getSecretKey())
                 .compact();
     }
 
@@ -70,6 +73,10 @@ public class JwtTokenUtil {
         Claims claims = (Claims) SecurityContextHolder.getContext().getAuthentication().getCredentials();
         TokenRevocation tr = new TokenRevocation(claims.getId(), new Date());
         tokenRevocationRepository.save(tr);
+    }
+
+    private SecretKey getSecretKey() {
+        return Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
     @Scheduled(fixedRate = 6 * 60 * 60 * 1000)

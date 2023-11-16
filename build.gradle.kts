@@ -25,7 +25,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-	implementation("org.xerial:sqlite-jdbc:3.41.2.2")
+	implementation("com.h2database:h2:2.2.220")
 	implementation("org.hibernate:hibernate-community-dialects:6.3.0.Final")
 	implementation("org.modelmapper:modelmapper:2.1.1")
 	implementation("org.springframework.security:spring-security-core:6.1.4")
@@ -41,12 +41,14 @@ dependencies {
 
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.2")
 	runtimeOnly("io.jsonwebtoken:jjwt-orgjson:0.12.2")
+	runtimeOnly("org.postgresql:postgresql")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.hamcrest:hamcrest:2.1")
 	testImplementation("org.mockito:mockito-core:3.12.4")
 	testImplementation("junit:junit:4.13.1")
-	testImplementation("com.h2database:h2")
+
+	testImplementation("com.h2database:h2:2.2.220")
 }
 
 tasks.withType<Test> {

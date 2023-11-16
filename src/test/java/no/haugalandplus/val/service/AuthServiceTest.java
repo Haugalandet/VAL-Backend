@@ -8,6 +8,7 @@ import no.haugalandplus.val.entities.Poll;
 import no.haugalandplus.val.entities.User;
 import no.haugalandplus.val.repository.PollRepository;
 import no.haugalandplus.val.repository.UserRepository;
+import no.haugalandplus.val.service.poll.PollService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

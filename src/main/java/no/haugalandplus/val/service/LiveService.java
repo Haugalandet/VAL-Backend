@@ -4,12 +4,16 @@ import no.haugalandplus.val.constants.PollStatusEnum;
 import no.haugalandplus.val.dto.PollDTO;
 import no.haugalandplus.val.dto.StartPollDTO;
 import no.haugalandplus.val.dto.VoteDTO;
+import no.haugalandplus.val.entities.Poll;
+import no.haugalandplus.val.repository.PollRepository;
+import no.haugalandplus.val.service.poll.PollService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 
 import java.time.Duration;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,11 +25,12 @@ public class LiveService {
     private final long delay = 1000;
     private final Map<Long, PollHandler> pollMap = new ConcurrentHashMap<>();
     private final PollService pollService;
-
+    private final PollRepository pollRepository;
     private final IoTService iotService;
 
-    public LiveService(PollService pollService, IoTService iotService) {
+    public LiveService(PollService pollService, PollRepository pollRepository, IoTService iotService) {
         this.pollService = pollService;
+        this.pollRepository = pollRepository;
         this.iotService = iotService;
     }
 
@@ -124,5 +129,19 @@ public class LiveService {
             }
             return pollSinks;
         }
+    }
+
+    @Scheduled(fixedRate = 1000)
+    public void pollChange() {
+        List<Poll> polls = pollRepository.findAllReadyForBecomingActive(pollService.clock(), PollStatusEnum.ACTIVE);
+        polls.forEach(p -> {
+            pollService.startPoll(p);
+            sendUpdateToPoll(p.getPollId());
+        });
+        polls = pollRepository.findAllReadyForBecomingEnded(pollService.clock(), PollStatusEnum.ACTIVE);
+        polls.forEach(p -> {
+            pollService.endPoll(p);
+            sendUpdateToPoll(p.getPollId());
+        });
     }
 }

@@ -1,5 +1,6 @@
-package no.haugalandplus.val.service;
+package no.haugalandplus.val.service.poll;
 
+import jakarta.persistence.LockModeType;
 import no.haugalandplus.val.constants.PollStatusEnum;
 import no.haugalandplus.val.dto.PollDTO;
 import no.haugalandplus.val.dto.StartPollDTO;
@@ -10,7 +11,11 @@ import no.haugalandplus.val.entities.Vote;
 import no.haugalandplus.val.repository.ChoiceRepository;
 import no.haugalandplus.val.repository.PollRepository;
 import no.haugalandplus.val.repository.VoteRepository;
+import no.haugalandplus.val.service.IoTService;
+import no.haugalandplus.val.service.ServiceUtils;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,34 +55,18 @@ public class PollService extends ServiceUtils {
     }
 
     public List<PollDTO> getAllPolls() {
-        return pollRepository.findAll().stream().map(p->convert(processPoll(p))).toList();
+        return pollRepository.findAll().stream().map(this::convert).toList();
     }
 
 
     public PollDTO getPoll(Long id) {
         Poll poll = pollRepository.findById(id).get();
-        return convert(processPoll(poll));
+        return convert(poll);
     }
 
     public PollDTO getPollWithRoomCode(String roomCode) {
         Poll poll = pollRepository.findByRoomCode(roomCode);
-        return convert(processPoll(poll));
-    }
-
-    private Poll processPoll(Poll poll) {
-        if (poll.getStatus() != PollStatusEnum.ACTIVE
-                && poll.getStartTime() != null
-                && poll.getStartTime().before(clock())) {
-            startPoll(poll, poll.getStartTime());
-            poll = pollRepository.save(poll);
-        }
-        if (poll.getStatus() == PollStatusEnum.ACTIVE
-                && poll.getEndTime() != null
-                && poll.getEndTime().before(clock())) {
-            poll.setStatus(PollStatusEnum.ENDED);
-            poll = pollRepository.save(poll);
-        }
-        return poll;
+        return convert(poll);
     }
 
     public PollDTO updatePollResult(Long id) {
@@ -117,36 +106,57 @@ public class PollService extends ServiceUtils {
 
     public PollDTO start(Long pollId, StartPollDTO startPollDTO) {
         Poll poll = pollRepository.findById(pollId).get();
-        poll = processPoll(poll);
         if (poll.getStatus() == PollStatusEnum.ACTIVE) {
             throw new AccessDeniedException("Poll can not be activated.");
         }
-        if (startPollDTO != null) {
-            if (startPollDTO.getStartTime() != null) {
-                if (startPollDTO.getStartTime().before(clock())) {
-                    throw new RuntimeException("Time already past");
-                }
-                poll.setStartTime(startPollDTO.getStartTime());
-            } else {
-                startPoll(poll);
-            }
 
-            if (startPollDTO.getEndTime() != null && startPollDTO.getEndTime().before(clock())) {
-                throw new RuntimeException("Time already past");
-            }
-            poll.setEndTime(startPollDTO.getEndTime());
-        } else {
-            startPoll(poll);
-        }
+        poll = setPollEndTime(poll, startPollDTO.getEndTime());
+        poll = setPollStartTime(poll, startPollDTO.getStartTime());
 
         return convert(pollRepository.save(poll));
     }
 
-    private void startPoll(Poll poll) {
-        startPoll(poll, clock());
+    private Poll setPollEndTime(Poll poll, Date endTime) {
+        poll.setEndTime(endTime);
+        return poll;
     }
 
-    private void startPoll(Poll poll, Date startTime) {
+    private Poll setPollStartTime(Poll poll, Date startTime) {
+        if (startTime != null) {
+            poll.setStartTime(startTime);
+        } else {
+            poll = startPoll(poll);
+        }
+        return poll;
+    }
+
+    public PollDTO end(Long pollId) {
+        Poll poll = pollRepository.findById(pollId).get();
+        if (poll.getStatus() != PollStatusEnum.ACTIVE) {
+            throw new AccessDeniedException("Poll can not be ended. Has status " + poll.getStatus().toString());
+        }
+        return convert(endPoll(poll));
+    }
+
+    public Date clock() {
+        return new Date();
+    }
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    public void deletePollsByUserId(Long userId) {
+        voteRepository.deleteAllByUserId(userId);
+        choiceRepository.deleteAllByUserId(userId);
+        pollRepository.deleteAllByUserId(userId);
+        voteRepository.anonymizeAllVotesWithUserId(userId);
+    }
+
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    public Poll startPoll(Poll poll) {
+        Date startTime = poll.getStartTime();
+        if (startTime == null) {
+            startTime = clock();
+        }
         poll.setStartTime(startTime);
         poll.setStatus(PollStatusEnum.ACTIVE);
         poll.getChoices().forEach( c -> {
@@ -154,28 +164,18 @@ public class PollService extends ServiceUtils {
             choiceRepository.save(c);
         });
         voteRepository.deleteAllByPoll(poll);
+        return pollRepository.save(poll);
     }
 
-    public PollDTO end(Long pollId) {
-        Poll poll = pollRepository.findById(pollId).get();
-        poll = processPoll(poll);
-        if (poll.getStatus() != PollStatusEnum.ACTIVE) {
-            throw new AccessDeniedException("Poll can not be ended. Has status " + poll.getStatus().toString());
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    public Poll endPoll(Poll poll) {
+        Date endTime = poll.getEndTime();
+        if (endTime == null) {
+            endTime = clock();
         }
-        poll.setEndTime(clock());
+        poll.setEndTime(endTime);
         poll.setStatus(PollStatusEnum.ENDED);
         ioTService.removeIot(poll);
-        return convert(pollRepository.save(poll));
-    }
-
-    protected Date clock() {
-        return new Date();
-    }
-
-    public void deletePollsByUserId(Long userId) {
-        voteRepository.deleteAllByUserId(userId);
-        choiceRepository.deleteAllByUserId(userId);
-        pollRepository.deleteAllByUserId(userId);
-        voteRepository.anonymizeAllVotesWithUserId(userId);
+        return pollRepository.save(poll);
     }
 }
