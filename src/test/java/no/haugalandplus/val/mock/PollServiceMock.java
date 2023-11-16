@@ -1,32 +1,35 @@
-package no.haugalandplus.val.service;
+package no.haugalandplus.val.mock;
 
 import no.haugalandplus.val.repository.ChoiceRepository;
 import no.haugalandplus.val.repository.PollRepository;
 import no.haugalandplus.val.repository.VoteRepository;
+import no.haugalandplus.val.service.IoTService;
+import no.haugalandplus.val.service.poll.PollService;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
+@Primary
 @Service
 public class PollServiceMock extends PollService {
+
+    @Autowired
+    private ClockMock clockMock;
 
     public PollServiceMock(PollRepository pollRepository, ModelMapper modelMapper, VoteRepository voteRepository, ChoiceRepository choiceRepository, IoTService ioTService) {
         super(pollRepository, modelMapper, voteRepository, choiceRepository, ioTService);
     }
 
-    private Date currentDate;
 
     @Override
-    protected Date clock() {
-        if (currentDate != null) {
-            return currentDate;
+    public Date clock() {
+        if (clockMock.clock() != null) {
+            return clockMock.clock();
         } else {
             return super.clock();
         }
-    }
-
-    public void setCurrentDate(Date currentDate) {
-        this.currentDate = currentDate;
     }
 }

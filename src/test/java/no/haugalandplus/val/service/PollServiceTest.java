@@ -6,13 +6,14 @@ import no.haugalandplus.val.dto.ChoiceDTO;
 import no.haugalandplus.val.dto.PollDTO;
 import no.haugalandplus.val.dto.StartPollDTO;
 import no.haugalandplus.val.dto.VoteDTO;
-import no.haugalandplus.val.entities.Choice;
 import no.haugalandplus.val.entities.Poll;
 import no.haugalandplus.val.entities.User;
-import no.haugalandplus.val.entities.Vote;
+import no.haugalandplus.val.mock.ClockMock;
+import no.haugalandplus.val.mock.PollServiceMock;
 import no.haugalandplus.val.repository.ChoiceRepository;
 import no.haugalandplus.val.repository.PollRepository;
 import no.haugalandplus.val.repository.VoteRepository;
+import no.haugalandplus.val.service.poll.PollService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 class PollServiceTest extends TestUtils {
 
     @Autowired
-    private PollServiceMock pollService;
+    private PollService pollService;
 
     @Autowired
     private PollRepository pollRepository;
@@ -42,6 +43,12 @@ class PollServiceTest extends TestUtils {
 
     @Autowired
     private VoteRepository voteRepository;
+
+    @Autowired
+    private LiveService liveService;
+
+    @Autowired
+    private ClockMock clockMock;
 
     @Test
     @Transactional
@@ -91,7 +98,7 @@ class PollServiceTest extends TestUtils {
 
         assertThat(pollService.getAllPolls(), hasSize(2));
 
-        pollService.start(poll.getPollId(), null);
+        pollService.start(poll.getPollId(), new StartPollDTO());
 
         assertThat(pollService.getPoll(poll.getPollId()), notNullValue());
         assertThat(pollService.getPoll(poll.getPollId()).getChoices(), hasSize(2));
@@ -106,7 +113,7 @@ class PollServiceTest extends TestUtils {
         Poll poll = saveNewPoll();
         poll = addChoices(poll);
 
-        pollService.start(poll.getPollId(), null);
+        pollService.start(poll.getPollId(), new StartPollDTO());
 
         PollDTO pollDTO = pollService.getPoll(poll.getPollId());
 
@@ -127,7 +134,7 @@ class PollServiceTest extends TestUtils {
             assertThat(e, instanceOf(Exception.class));
         }
 
-        pollService.start(poll.getPollId(), null);
+        pollService.start(poll.getPollId(), new StartPollDTO());
 
         try {
             pollService.start(poll.getPollId(), null);
@@ -155,12 +162,15 @@ class PollServiceTest extends TestUtils {
         poll.setStartTime(new Date(16440544000000L));
         poll = pollRepository.save(poll);
 
+        liveService.pollChange();
+
         PollDTO pollDTO = pollService.getPoll(poll.getPollId());
         assertThat(pollDTO.getStatus(), is(PollStatusEnum.NOT_INITIALISED));
 
         poll.setStartTime(new Date(1644054400000L));
         poll = pollRepository.save(poll);
 
+        liveService.pollChange();
 
         pollDTO = pollService.getPoll(poll.getPollId());
         assertThat(pollDTO.getStatus(), is(PollStatusEnum.ACTIVE));
@@ -168,11 +178,15 @@ class PollServiceTest extends TestUtils {
         poll.setEndTime(new Date(16440544000000L));
         poll = pollRepository.save(poll);
 
+        liveService.pollChange();
+
         pollDTO = pollService.getPoll(poll.getPollId());
         assertThat(pollDTO.getStatus(), is(PollStatusEnum.ACTIVE));
 
         poll.setEndTime(new Date(1644054400000L));
         poll = pollRepository.save(poll);
+
+        liveService.pollChange();
 
         pollDTO = pollService.getPoll(poll.getPollId());
         assertThat(pollDTO.getStatus(), is(PollStatusEnum.ENDED));
@@ -235,19 +249,23 @@ class PollServiceTest extends TestUtils {
 
         long time = 10000000L;
 
-        pollService.setCurrentDate(new Date(time));
+        clockMock.setCurrentDate(new Date(time));
 
         StartPollDTO startPollDTO = new StartPollDTO();
         startPollDTO.setEndTime(new Date(time + 1000));
 
         pollService.start(poll.getPollId(), startPollDTO);
 
+        liveService.pollChange();
+
         poll = pollRepository.findById(poll.getPollId()).get();
 
         assertThat(poll.getStatus(), is(PollStatusEnum.ACTIVE));
         assertThat(poll.getStartTime(), is(new Date(time)));
 
-        pollService.setCurrentDate(new Date(time + 100000));
+        clockMock.setCurrentDate(new Date(time + 100000));
+
+        liveService.pollChange();
 
         PollDTO pollDTO = pollService.getPoll(poll.getPollId());
 
@@ -265,7 +283,7 @@ class PollServiceTest extends TestUtils {
 
         long time = 10000000L;
 
-        pollService.setCurrentDate(new Date(time));
+        clockMock.setCurrentDate(new Date(time));
 
         StartPollDTO startPollDTO = new StartPollDTO();
         startPollDTO.setEndTime(new Date(time + 1000));
@@ -273,15 +291,21 @@ class PollServiceTest extends TestUtils {
 
         pollService.start(poll.getPollId(), startPollDTO);
 
+        liveService.pollChange();
+
         PollDTO pollDTO = pollService.getPoll(poll.getPollId());
         assertThat(pollDTO.getStatus(), is(PollStatusEnum.NOT_INITIALISED));
 
-        pollService.setCurrentDate(new Date(time + 200));
+        clockMock.setCurrentDate(new Date(time + 200));
+
+        liveService.pollChange();
 
         pollDTO = pollService.getPoll(poll.getPollId());
         assertThat(pollDTO.getStatus(), is(PollStatusEnum.ACTIVE));
 
-        pollService.setCurrentDate(new Date(time + 100000));
+        clockMock.setCurrentDate(new Date(time + 100000));
+
+        liveService.pollChange();
 
         pollDTO = pollService.getPoll(poll.getPollId());
         assertThat(pollDTO.getStatus(), is(PollStatusEnum.ENDED));

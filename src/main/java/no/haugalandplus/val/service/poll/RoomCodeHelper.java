@@ -1,4 +1,4 @@
-package no.haugalandplus.val.service;
+package no.haugalandplus.val.service.poll;
 
 import java.math.BigInteger;
 

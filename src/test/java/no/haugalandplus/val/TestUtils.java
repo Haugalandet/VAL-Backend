@@ -7,7 +7,7 @@ import no.haugalandplus.val.entities.User;
 import no.haugalandplus.val.repository.PollRepository;
 import no.haugalandplus.val.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
-import no.haugalandplus.val.service.RoomCodeHelper;
+import no.haugalandplus.val.service.poll.RoomCodeHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

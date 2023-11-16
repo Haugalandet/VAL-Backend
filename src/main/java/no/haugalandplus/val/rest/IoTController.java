@@ -4,7 +4,7 @@ import no.haugalandplus.val.dto.PollDTO;
 import no.haugalandplus.val.dto.VoteDTO;
 import no.haugalandplus.val.service.IoTService;
 import no.haugalandplus.val.service.LiveService;
-import no.haugalandplus.val.service.PollService;
+import no.haugalandplus.val.service.poll.PollService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 

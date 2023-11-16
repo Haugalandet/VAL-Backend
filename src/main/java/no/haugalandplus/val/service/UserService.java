@@ -5,6 +5,7 @@ import no.haugalandplus.val.dto.CreateUserDTO;
 import no.haugalandplus.val.dto.UserDTO;
 import no.haugalandplus.val.entities.User;
 import no.haugalandplus.val.repository.UserRepository;
+import no.haugalandplus.val.service.poll.PollService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
