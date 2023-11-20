@@ -32,6 +32,7 @@ dependencies {
 	implementation("org.springframework.security:spring-security-config:6.1.4")
 	implementation("org.springframework.security:spring-security-web:6.1.4")
 	implementation("io.jsonwebtoken:jjwt-api:0.12.2")
+	implementation("org.springframework.boot:spring-boot-starter-amqp")
 
 	compileOnly("org.projectlombok:lombok")
 
