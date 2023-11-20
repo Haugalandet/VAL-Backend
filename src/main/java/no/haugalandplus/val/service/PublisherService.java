@@ -1,12 +1,10 @@
 package no.haugalandplus.val.service;
 
-package harecon.harecon.rabbit;
-
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
+
 
 @Service
 public class PublisherService {
@@ -21,7 +19,7 @@ public class PublisherService {
     //hent resultat
 
     @Autowired
-    public Publisher(RabbitTemplate rabbitTemplate) {
+    public PublisherService(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
 
