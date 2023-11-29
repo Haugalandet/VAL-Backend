@@ -20,7 +20,7 @@ public class PollServiceMock extends PollService {
     private ClockMock clockMock;
 
     public PollServiceMock(PollRepository pollRepository, ModelMapper modelMapper, VoteRepository voteRepository, ChoiceRepository choiceRepository, IoTService ioTService) {
-        super(pollRepository, modelMapper, voteRepository, choiceRepository, ioTService);
+        super(pollRepository, modelMapper, voteRepository, choiceRepository, ioTService, publisherService);
     }
 
 

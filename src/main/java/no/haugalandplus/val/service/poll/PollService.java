@@ -12,13 +12,17 @@ import no.haugalandplus.val.repository.ChoiceRepository;
 import no.haugalandplus.val.repository.PollRepository;
 import no.haugalandplus.val.repository.VoteRepository;
 import no.haugalandplus.val.service.IoTService;
+import no.haugalandplus.val.service.PublisherService;
 import no.haugalandplus.val.service.ServiceUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.jpa.repository.Lock;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 import java.util.Date;
 import java.util.List;
@@ -31,13 +35,15 @@ public class PollService extends ServiceUtils {
     private final VoteRepository voteRepository;
     private final ChoiceRepository choiceRepository;
     private final IoTService ioTService;
+    private final PublisherService publisherService;
 
-    public PollService(PollRepository pollRepository, ModelMapper modelMapper, VoteRepository voteRepository, ChoiceRepository choiceRepository, IoTService ioTService) {
+    public PollService(PollRepository pollRepository, ModelMapper modelMapper, VoteRepository voteRepository, ChoiceRepository choiceRepository, IoTService ioTService, PublisherService publisherService) {
         this.pollRepository = pollRepository;
         this.modelMapper = modelMapper;
         this.voteRepository = voteRepository;
         this.choiceRepository = choiceRepository;
         this.ioTService = ioTService;
+        this.publisherService = publisherService;
     }
 
     private PollDTO convert(Poll poll) {
@@ -152,6 +158,7 @@ public class PollService extends ServiceUtils {
 
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Transactional
     public Poll startPoll(Poll poll) {
         Date startTime = poll.getStartTime();
         if (startTime == null) {
@@ -167,7 +174,6 @@ public class PollService extends ServiceUtils {
         return pollRepository.save(poll);
     }
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     public Poll endPoll(Poll poll) {
         Date endTime = poll.getEndTime();
         if (endTime == null) {
@@ -176,6 +182,13 @@ public class PollService extends ServiceUtils {
         poll.setEndTime(endTime);
         poll.setStatus(PollStatusEnum.ENDED);
         ioTService.removeIot(poll);
+
+        try {
+            publisherService.publishMessage(new ObjectMapper().writeValueAsString(convert(poll))); //convert to json again
+        } catch (Exception e){
+            // TODO
+        }
+
         return pollRepository.save(poll);
     }
 }

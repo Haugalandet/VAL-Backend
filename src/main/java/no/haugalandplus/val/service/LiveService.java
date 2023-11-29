@@ -9,6 +9,7 @@ import no.haugalandplus.val.repository.PollRepository;
 import no.haugalandplus.val.service.poll.PollService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 
@@ -131,7 +132,8 @@ public class LiveService {
         }
     }
 
-    @Scheduled(fixedRate = 1000)
+    @Scheduled(fixedRate = 10000)
+    @Transactional
     public void pollChange() {
         List<Poll> polls = pollRepository.findAllReadyForBecomingActive(pollService.clock(), PollStatusEnum.ACTIVE);
         polls.forEach(p -> {

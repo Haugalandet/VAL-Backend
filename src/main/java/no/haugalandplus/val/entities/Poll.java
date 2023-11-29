@@ -30,6 +30,9 @@ public class Poll {
 
     private PollStatusEnum status;
 
+    @Version
+    private Long version = 0L;
+
     @ManyToOne
     private User user;
 

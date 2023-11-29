@@ -33,6 +33,9 @@ dependencies {
 	implementation("org.springframework.security:spring-security-config:6.1.4")
 	implementation("org.springframework.security:spring-security-web:6.1.4")
 	implementation("io.jsonwebtoken:jjwt-api:0.12.2")
+	implementation ("com.fasterxml.jackson.core:jackson-databind:2.10.0")
+
+
 
 
 	compileOnly("org.projectlombok:lombok")
@@ -49,7 +52,6 @@ dependencies {
 	testImplementation("org.hamcrest:hamcrest:2.1")
 	testImplementation("org.mockito:mockito-core:3.12.4")
 	testImplementation("junit:junit:4.13.1")
-	testImplementation("org.springframework.amqp:spring-rabbit-test")
 
 	testImplementation("com.h2database:h2:2.2.220")
 }
