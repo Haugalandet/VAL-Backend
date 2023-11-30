@@ -1,5 +1,6 @@
 package no.haugalandplus.val.mock;
 
+import jakarta.persistence.EntityManager;
 import no.haugalandplus.val.repository.ChoiceRepository;
 import no.haugalandplus.val.repository.PollRepository;
 import no.haugalandplus.val.repository.VoteRepository;
@@ -20,8 +21,8 @@ public class PollServiceMock extends PollService {
     @Autowired
     private ClockMock clockMock;
 
-    public PollServiceMock(PollRepository pollRepository, ModelMapper modelMapper, VoteRepository voteRepository, ChoiceRepository choiceRepository, IoTService ioTService, PublisherService publisherService) {
-        super(pollRepository, modelMapper, voteRepository, choiceRepository, ioTService, publisherService);
+    public PollServiceMock(PollRepository pollRepository, ModelMapper modelMapper, VoteRepository voteRepository, ChoiceRepository choiceRepository, IoTService ioTService, PublisherService publisherService, EntityManager entityManager) {
+        super(pollRepository, modelMapper, voteRepository, choiceRepository, ioTService, publisherService, entityManager);
     }
 
 

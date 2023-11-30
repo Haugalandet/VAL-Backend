@@ -1,6 +1,8 @@
 package no.haugalandplus.val.service.poll;
 
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
+import jakarta.persistence.PersistenceContext;
 import no.haugalandplus.val.constants.PollStatusEnum;
 import no.haugalandplus.val.dto.PollDTO;
 import no.haugalandplus.val.dto.StartPollDTO;
@@ -16,11 +18,9 @@ import no.haugalandplus.val.service.PublisherService;
 import no.haugalandplus.val.service.ServiceUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.jpa.repository.Lock;
-import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
@@ -37,13 +37,17 @@ public class PollService extends ServiceUtils {
     private final IoTService ioTService;
     private final PublisherService publisherService;
 
-    public PollService(PollRepository pollRepository, ModelMapper modelMapper, VoteRepository voteRepository, ChoiceRepository choiceRepository, IoTService ioTService, PublisherService publisherService) {
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    public PollService(PollRepository pollRepository, ModelMapper modelMapper, VoteRepository voteRepository, ChoiceRepository choiceRepository, IoTService ioTService, PublisherService publisherService, EntityManager entityManager) {
         this.pollRepository = pollRepository;
         this.modelMapper = modelMapper;
         this.voteRepository = voteRepository;
         this.choiceRepository = choiceRepository;
         this.ioTService = ioTService;
         this.publisherService = publisherService;
+        this.entityManager = entityManager;
     }
 
     private PollDTO convert(Poll poll) {
@@ -157,38 +161,43 @@ public class PollService extends ServiceUtils {
     }
 
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Transactional
     public Poll startPoll(Poll poll) {
-        Date startTime = poll.getStartTime();
+        Poll lockedPoll = entityManager.find(Poll.class, poll.getPollId(), LockModeType.PESSIMISTIC_WRITE);
+
+        Date startTime = lockedPoll.getStartTime();
         if (startTime == null) {
             startTime = clock();
         }
-        poll.setStartTime(startTime);
-        poll.setStatus(PollStatusEnum.ACTIVE);
-        poll.getChoices().forEach( c -> {
+        lockedPoll.setStartTime(startTime);
+        lockedPoll.setStatus(PollStatusEnum.ACTIVE);
+        lockedPoll.getChoices().forEach(c -> {
             c.setVoteCount(0);
-            choiceRepository.save(c);
+            entityManager.merge(c);
         });
-        voteRepository.deleteAllByPoll(poll);
-        return pollRepository.save(poll);
+        voteRepository.deleteAllByPoll(lockedPoll);
+
+        return entityManager.merge(lockedPoll);
     }
 
+    @Transactional
     public Poll endPoll(Poll poll) {
-        Date endTime = poll.getEndTime();
+        Poll lockedPoll = entityManager.find(Poll.class, poll.getPollId(), LockModeType.PESSIMISTIC_WRITE);
+
+        Date endTime = lockedPoll.getEndTime();
         if (endTime == null) {
             endTime = clock();
         }
-        poll.setEndTime(endTime);
-        poll.setStatus(PollStatusEnum.ENDED);
-        ioTService.removeIot(poll);
+        lockedPoll.setEndTime(endTime);
+        lockedPoll.setStatus(PollStatusEnum.ENDED);
+        ioTService.removeIot(lockedPoll);
 
         try {
-            publisherService.publishMessage(new ObjectMapper().writeValueAsString(convert(poll))); //convert to json again
-        } catch (Exception e){
-            // TODO
+            publisherService.publishMessage(new ObjectMapper().writeValueAsString(convert(lockedPoll)));
+        } catch (Exception e) {
+            // Handle the exception appropriately
         }
 
-        return pollRepository.save(poll);
+        return entityManager.merge(lockedPoll);
     }
 }
